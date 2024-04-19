@@ -22,6 +22,21 @@ impl BencodeVariable for BencodeArray {
     }
 }
 
+impl BencodeArray {
+
+    fn contains(&self, v: BencodeVariable) {
+
+    }
+
+    fn add(&mut self, v: BencodeVariable) {
+
+    }
+
+    fn remove(&mut self, v: BencodeVariable) {
+
+    }
+}
+
 /*
 pub enum BencodeElem {
     String(String),
