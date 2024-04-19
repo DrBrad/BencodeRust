@@ -1,4 +1,8 @@
 //use lava_torrent::bencode::BencodeElem;
+
+//use proc_macro::TokenStream;
+//use quote::quote;
+//use syn::{parse_macro_input, AttributeArgs, ItemFn, Lit, Meta, NestedMeta};
 use crate::variables::bencode_array::BencodeArray;
 
 mod variables;
@@ -11,6 +15,7 @@ fn main() {
 
     //println!("{}", b.l.len());
 }
+
 /*
 #[derive(Debug)]
 enum Bencode {
@@ -54,3 +59,54 @@ fn main() {
     println!("{}", encoded_data);
 }
 */
+
+
+
+/*
+
+
+
+#[proc_macro_attribute]
+pub fn my_annotation(args: TokenStream, input: TokenStream) -> TokenStream {
+    // Parse the attribute arguments
+    let args = parse_macro_input!(args as AttributeArgs);
+
+    // Process the attribute arguments
+    let mut my_attribute_value = None;
+    for arg in args {
+        match arg {
+            NestedMeta::Meta(Meta::NameValue(nv)) if nv.path.is_ident("my_attribute") => {
+                if let Lit::Str(value) = nv.lit {
+                    my_attribute_value = Some(value.value());
+                }
+            }
+            _ => {
+                // Handle other attribute formats or ignore unrecognized attributes
+            }
+        }
+    }
+
+    // Parse the input tokens into a syntax tree
+    let input_fn = parse_macro_input!(input as ItemFn);
+
+    // Get the function name
+    let fn_name = &input_fn.sig.ident;
+
+    // Generate the modified function definition
+    let expanded = quote! {
+        #input_fn
+
+        #[no_mangle]
+        pub extern "C" fn #fn_name() {
+            println!("Before function call: {}", stringify!(#fn_name));
+            println!("Custom attribute value: {:?}", #my_attribute_value);
+            #fn_name();
+            println!("After function call: {}", stringify!(#fn_name));
+        }
+    };
+
+    // Convert the generated tokens back into a TokenStream
+    TokenStream::from(expanded)
+}
+*/
+

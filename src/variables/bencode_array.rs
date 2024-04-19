@@ -3,8 +3,25 @@ use super::inter::bencode_variable;
 
 pub struct BencodeArray {
     s: u32,
-    pub l: Vec<dyn BencodeVariable>
+    pub l: Vec<BencodeVariable>
 }
+
+
+impl BencodeVariable for BencodeArray {
+
+    fn byte_size(&self) -> u32 {
+        self.s
+    }
+
+    fn encode(&self) -> Vec<u8> {
+        todo!()
+    }
+
+    fn decode(&self, buf: Vec<u8>) {
+        todo!()
+    }
+}
+
 /*
 pub enum BencodeElem {
     String(String),
@@ -17,16 +34,6 @@ pub enum BencodeElem {
 */
 
 /*
-impl BencodeVariable for BencodeArray {
-
-    fn byte_size(&self) -> u32 {
-        self.s
-    }
-
-    fn encode(&self) -> Vec<u8> {
-        todo!()
-    }
-}
 
 impl BencodeArray {
 

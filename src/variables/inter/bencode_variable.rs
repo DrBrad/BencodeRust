@@ -14,4 +14,6 @@ pub trait BencodeVariable {
     fn byte_size(&self) -> u32;
 
     fn encode(&self) -> Vec<u8>;
+
+    fn decode(&self, buf: Vec<u8>);
 }
