@@ -20,7 +20,7 @@ fn main() {
     println!("{:?}", ex.to_bencode().unwrap());
 
 
-    let example = IntegerWrapper(21);
+    let example = 21;
     let encoded = example.to_bencode().unwrap();
 
     println!("{:?}", encoded);
@@ -33,16 +33,6 @@ fn main() {
 
     //let encoded = 21.to_bencode()?;
     //assert_eq!(b"i21e", encoded.as_slice());
-}
-
-struct IntegerWrapper(i64);
-
-impl ToBencode for IntegerWrapper {
-    const MAX_DEPTH: usize = 0;
-
-    fn encode(&self, encoder: SingleItemEncoder) -> Result<(), Error> {
-        encoder.emit_int(self.0)
-    }
 }
 
 
