@@ -13,6 +13,12 @@ fn main() {
     println!("{:?}", a.l.get(0).unwrap().object())
     */
 
+    let mut ex = Vec::new();
+    ex.push("asdasd");
+    ex.push("123123");
+
+    println!("{:?}", ex.to_bencode().unwrap());
+
 
     let example = IntegerWrapper(21);
     let encoded = example.to_bencode().unwrap();
