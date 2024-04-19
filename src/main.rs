@@ -2,7 +2,6 @@
 use crate::variables::bencode_array::BencodeArray;
 
 mod variables;
-mod bencoder;
 
 fn main() {
     //BencodeElem::Dictionary();
