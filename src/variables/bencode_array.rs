@@ -1,11 +1,11 @@
+use crate::variables::bencode_number::BencodeNumber;
 use crate::variables::inter::bencode_variable::BencodeVariable;
 use super::inter::bencode_variable;
 
 pub struct BencodeArray {
     s: u32,
-    pub l: Vec<BencodeVariable>
+    pub l: Vec<Box<dyn BencodeVariable>>
 }
-
 
 impl BencodeVariable for BencodeArray {
 
@@ -24,43 +24,22 @@ impl BencodeVariable for BencodeArray {
 
 impl BencodeArray {
 
-    fn contains(&self, v: BencodeVariable) {
-
-    }
-
-    fn add(&mut self, v: BencodeVariable) {
-
-    }
-
-    fn remove(&mut self, v: BencodeVariable) {
-
-    }
-}
-
-/*
-pub enum BencodeElem {
-    String(String),
-    Bytes(Vec<u8>),
-    Integer(i64),
-    List(Vec<BencodeElem>),
-    //Dictionary(HashMap<String, BencodeElem>),
-    //RawDictionary(HashMap<Vec<u8>, BencodeElem>),
-}
-*/
-
-/*
-
-impl BencodeArray {
-
     pub fn new() -> Self {
         Self {
-            s: 2,
+            s: 0,
             l: Vec::new()
         }
     }
 
-    pub fn add(&mut self, v: &dyn BencodeVariable) {
-        self.l.push(v);
+    pub fn contains(&self, v: &dyn BencodeVariable) {
+
+    }
+
+    pub fn add(&mut self, v: BencodeNumber) {
+        self.l.push(Box::new(v));
+    }
+
+    pub fn remove(&mut self, v: &dyn BencodeVariable) {
+
     }
 }
-*/

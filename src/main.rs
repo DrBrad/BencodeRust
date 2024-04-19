@@ -4,10 +4,17 @@
 //use quote::quote;
 //use syn::{parse_macro_input, AttributeArgs, ItemFn, Lit, Meta, NestedMeta};
 use crate::variables::bencode_array::BencodeArray;
+use crate::variables::bencode_number::BencodeNumber;
 
 mod variables;
 
 fn main() {
+    let mut a = BencodeArray::new();
+    a.add(BencodeNumber::from(100));
+    println!("{}", a.l.len());
+
+    //println!("{}", a.l.get(0));
+
     //BencodeElem::Dictionary();
     //BencodeElem::String("asdasd".to_string());
     //let mut b = BencodeArray::new();
