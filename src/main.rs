@@ -28,11 +28,41 @@ fn main() {
     let decoded = i64::from_bencode(&encoded).unwrap();
     println!("{}", decoded);
 
+    "asdasd".to_bencode();
+
 
     //let encoded = ?;
 
     //let encoded = 21.to_bencode()?;
     //assert_eq!(b"i21e", encoded.as_slice());
 }
+
+
+pub trait ToBencode2 {
+    /// The maximum depth that this object could encode to. Leaves do not consume a level, so an
+    /// `i1e` has depth 0 and `li1ee` has depth 1.
+    //const MAX_DEPTH: usize;
+
+    /// Encode this object into the bencode stream
+    fn encode(&self, encoder: SingleItemEncoder);// -> Result<(), Error>;
+
+    /// Encode this object to a byte string
+    fn to_bencode(&self) -> Vec<u8> {
+        Vec::new()
+        //let mut encoder = Encoder::new().with_max_depth(Self::MAX_DEPTH);
+        //encoder.emit_with(|e| self.encode(e).map_err(Error::into))?;
+
+        //let bytes = encoder.get_output()?;
+        //Ok(bytes)
+    }
+}
+
+impl<'a> ToBencode2 for &'a str {
+
+    fn encode(&self, encoder: SingleItemEncoder) {
+        //encoder.emit_str(self).map_err(Error::from)
+    }
+}
+
 
 
