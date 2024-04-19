@@ -1,6 +1,7 @@
+use bendy::decoding::FromBencode;
 use crate::variables::bencode_array::BencodeArray;
 use crate::variables::bencode_number::BencodeNumber;
-use bendy::encoding::{ToBencode, Error};
+use bendy::encoding::{ToBencode, SingleItemEncoder, Error};
 
 mod variables;
 
@@ -13,13 +14,29 @@ fn main() {
     */
 
 
-    {
-    let my_data = vec!["hello", "world"];
-    let encoded = my_data.to_bencode()?;
+    let example = IntegerWrapper(21);
+    let encoded = example.to_bencode().unwrap();
 
-    assert_eq!(b"l5:hello5:worlde", encoded.as_slice());
-    }
+    println!("{:?}", encoded);
 
-    //Ok::<(), Error>(())
+    let decoded = i64::from_bencode(&encoded).unwrap();
+    println!("{}", decoded);
+
+
+    //let encoded = ?;
+
+    //let encoded = 21.to_bencode()?;
+    //assert_eq!(b"i21e", encoded.as_slice());
 }
+
+struct IntegerWrapper(i64);
+
+impl ToBencode for IntegerWrapper {
+    const MAX_DEPTH: usize = 0;
+
+    fn encode(&self, encoder: SingleItemEncoder) -> Result<(), Error> {
+        encoder.emit_int(self.0)
+    }
+}
+
 
