@@ -21,7 +21,6 @@ impl BencodeVariable for BencodeNumber {
 }
 
 impl From<usize> for BencodeNumber {
-//impl From from BencodeNumber {
 
     fn from(n: usize) -> Self {
         Self {
