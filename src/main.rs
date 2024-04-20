@@ -4,7 +4,7 @@ mod variables;
 
 
 fn main() {
-    let test = "blank".to_string();
+    let test = "blank";
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
     println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));

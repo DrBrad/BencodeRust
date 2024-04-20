@@ -13,6 +13,13 @@ impl ToBencode for String {
     }
 }
 
+impl ToBencode for &str {
+
+    fn to_bencode(&self) -> Vec<u8> {
+        encode_string(self)
+    }
+}
+
 macro_rules! impl_encodable_integer {
     ($($type:ty)*) => {$(
         impl ToBencode for $type {
