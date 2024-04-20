@@ -31,11 +31,15 @@ macro_rules! impl_encodable_iterable {
         impl <ContentT> ToBencode for $type<ContentT> where ContentT: ToBencode {
 
             fn to_bencode(&self) -> Vec<u8> {
+                let mut r: Vec<u8> = Vec::new();
+                r.push(b'l');
+
                 for item in self {
-                    println!("TEST");
-                    //println!("{:?}", item);
+                    r.extend_from_slice(&item.to_bencode());
                 }
-                Vec::new()
+
+                r.push(b'e');
+                r
             }
         }
     )*}

@@ -1,3 +1,4 @@
+use crate::variables::to_bencode::ToBencode;
 
 pub fn encode_string(v: &str) -> Vec<u8> {
     let mut r: Vec<u8> = Vec::new();
@@ -16,4 +17,16 @@ pub fn encode_number<T: std::fmt::Display>(v: &T) -> Vec<u8> {
     r.push(b'e');
     r
 }
+/*
+pub fn encode_list<E: ToBencode>(v: E) -> Vec<u8> {
+    let mut r: Vec<u8> = Vec::new();
+    r.push(b'l');
 
+    for item in v {
+        //println!("{:?}", item);
+    }
+
+    r.push(b'e');
+    r
+}
+*/

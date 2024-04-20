@@ -16,7 +16,12 @@ fn main() {
 
     let mut test: Vec<String> = Vec::new();
     test.push("hello".to_string());
-    test.to_bencode();
+    test.push("test".to_string());
+    test.push("world".to_string());
+    let encoded = test.to_bencode();
+    println!("{:?}", encoded);
+    println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
+
 
     /*
     let mut a = BencodeArray::new();
