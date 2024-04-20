@@ -1,3 +1,3 @@
 pub mod inter;
-pub mod bencode_array;
-pub mod bencode_number;
+pub mod to_bencode;
+pub mod encoder;

@@ -1,11 +1,18 @@
-use bendy::decoding::FromBencode;
-use crate::variables::bencode_array::BencodeArray;
-use crate::variables::bencode_number::BencodeNumber;
-use bendy::encoding::{ToBencode, SingleItemEncoder, Error};
+use crate::variables::to_bencode::ToBencode;
 
 mod variables;
 
+
 fn main() {
+    let test = "blank".to_string();
+    let encoded = test.to_bencode();
+    println!("{:?}", encoded);
+
+    let string = String::from_utf8(encoded).expect("Invalid UTF-8");
+
+    // Print the string
+    println!("{}", string);
+
     /*
     let mut a = BencodeArray::new();
     a.add(BencodeNumber::from(100));
@@ -13,6 +20,7 @@ fn main() {
     println!("{:?}", a.l.get(0).unwrap().object())
     */
 
+    /*
     let mut ex = Vec::new();
     ex.push("asdasd");
     ex.push("123123");
@@ -27,9 +35,9 @@ fn main() {
 
     let decoded = i64::from_bencode(&encoded).unwrap();
     println!("{}", decoded);
+    */
 
-    "asdasd".to_bencode();
-
+    //let s = "asdasd".to_bencode2();
 
     //let encoded = ?;
 
@@ -37,6 +45,8 @@ fn main() {
     //assert_eq!(b"i21e", encoded.as_slice());
 }
 
+
+/*
 
 pub trait ToBencode2 {
     /// The maximum depth that this object could encode to. Leaves do not consume a level, so an
@@ -47,7 +57,7 @@ pub trait ToBencode2 {
     fn encode(&self, encoder: SingleItemEncoder);// -> Result<(), Error>;
 
     /// Encode this object to a byte string
-    fn to_bencode(&self) -> Vec<u8> {
+    fn to_bencode2(&self) -> Vec<u8> {
         Vec::new()
         //let mut encoder = Encoder::new().with_max_depth(Self::MAX_DEPTH);
         //encoder.emit_with(|e| self.encode(e).map_err(Error::into))?;
@@ -63,6 +73,8 @@ impl<'a> ToBencode2 for &'a str {
         //encoder.emit_str(self).map_err(Error::from)
     }
 }
+*/
+
 
 
 
