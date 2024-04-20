@@ -7,12 +7,12 @@ fn main() {
     let test = "blank".to_string();
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
+    println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
 
-    let string = String::from_utf8(encoded).expect("Invalid UTF-8");
-
-    // Print the string
-    println!("{}", string);
-
+    let test = 100;
+    let encoded = test.to_bencode();
+    println!("{:?}", encoded);
+    println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
     /*
     let mut a = BencodeArray::new();
     a.add(BencodeNumber::from(100));

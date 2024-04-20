@@ -1,4 +1,4 @@
-use super::encoder::encode_string;
+use super::encoder::{encode_number, encode_string};
 
 pub trait ToBencode {
 
@@ -15,7 +15,7 @@ impl ToBencode for String {
 impl ToBencode for u32 {
 
     fn to_bencode(&self) -> Vec<u8> {
-        Vec::new()
+        encode_number(self)
     }
 }
 
