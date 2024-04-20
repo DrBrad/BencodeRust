@@ -1,4 +1,5 @@
-use std::collections::{LinkedList, VecDeque};
+use std::collections::{BTreeMap, HashMap, LinkedList, VecDeque};
+use std::hash::{BuildHasher, Hash};
 use super::encoder::{encode_number, encode_string};
 
 pub trait ToBencode {
@@ -53,6 +54,30 @@ macro_rules! impl_encodable_iterable {
 }
 
 impl_encodable_iterable!(Vec VecDeque LinkedList);
+
+
+
+
+impl<K: AsRef<[u8]>, V: ToBencode> ToBencode for BTreeMap<K, V> {
+
+    fn to_bencode(&self) -> Vec<u8> {
+        //encode_string(self)
+        Vec::new()
+    }
+}
+
+impl<K, V, S> ToBencode for HashMap<K, V, S> where K: AsRef<[u8]> + Eq + Hash, V: ToBencode, S: BuildHasher, {
+
+    fn to_bencode(&self) -> Vec<u8> {
+        //encode_string(self)
+        Vec::new()
+    }
+}
+
+
+
+
+
 
 
 /*

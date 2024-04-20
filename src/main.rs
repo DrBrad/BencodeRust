@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::variables::to_bencode::ToBencode;
 
 mod variables;
@@ -29,6 +30,7 @@ fn main() {
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
     println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
+
 
 
     /*
