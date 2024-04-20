@@ -58,19 +58,35 @@ impl_encodable_iterable!(Vec VecDeque LinkedList);
 
 
 
-impl<K: AsRef<[u8]>, V: ToBencode> ToBencode for BTreeMap<K, V> {
+impl<K, V> ToBencode for BTreeMap<K, V> where K: ToBencode, V: ToBencode {
 
     fn to_bencode(&self) -> Vec<u8> {
-        //encode_string(self)
-        Vec::new()
+        let mut r: Vec<u8> = Vec::new();
+        r.push(b'd');
+
+        for (key, value) in self {
+            r.extend_from_slice(&key.to_bencode());
+            r.extend_from_slice(&value.to_bencode());
+        }
+
+        r.push(b'e');
+        r
     }
 }
 
-impl<K, V, S> ToBencode for HashMap<K, V, S> where K: AsRef<[u8]> + Eq + Hash, V: ToBencode, S: BuildHasher, {
+impl<K, V, S> ToBencode for HashMap<K, V, S> where K: ToBencode, V: ToBencode, S: BuildHasher, {
 
     fn to_bencode(&self) -> Vec<u8> {
-        //encode_string(self)
-        Vec::new()
+        let mut r: Vec<u8> = Vec::new();
+        r.push(b'd');
+
+        for (key, value) in self {
+            r.extend_from_slice(&key.to_bencode());
+            r.extend_from_slice(&value.to_bencode());
+        }
+
+        r.push(b'e');
+        r
     }
 }
 

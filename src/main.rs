@@ -1,10 +1,11 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use crate::variables::to_bencode::ToBencode;
 
 mod variables;
 
 
 fn main() {
+    /*
     let test = "blank";
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
@@ -28,6 +29,16 @@ fn main() {
     test.push(5);
     test.push(7);
     let encoded = test.to_bencode();
+    println!("{:?}", encoded);
+    println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
+    */
+
+    let mut n = BTreeMap::new();
+    n.insert("hello", "world");
+    n.insert("hello2z", "world5z");
+    n.insert("hello3z", "world6z");
+
+    let encoded = n.to_bencode();
     println!("{:?}", encoded);
     println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
 
