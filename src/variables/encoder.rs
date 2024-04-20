@@ -10,7 +10,7 @@ pub fn encode_string(v: &str) -> Vec<u8> {
     }
     */
 
-    r.push(':' as u8);
+    r.push(b':');
 
     r.extend_from_slice(z);
     r
@@ -18,9 +18,9 @@ pub fn encode_string(v: &str) -> Vec<u8> {
 
 pub fn encode_number(v: &u32) -> Vec<u8> {
     let mut r: Vec<u8> = Vec::new();
-    r.push('i' as u8);
+    r.push(b'i');
     r.extend_from_slice(v.to_string().as_bytes());
-    r.push('e' as u8);
+    r.push(b'e');
     r
 }
 
