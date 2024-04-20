@@ -13,6 +13,11 @@ fn main() {
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
     println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
+
+    let mut test: Vec<String> = Vec::new();
+    test.push("hello".to_string());
+    test.to_bencode();
+
     /*
     let mut a = BencodeArray::new();
     a.add(BencodeNumber::from(100));
