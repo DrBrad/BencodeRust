@@ -22,6 +22,14 @@ fn main() {
     println!("{:?}", encoded);
     println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
 
+    let mut test: Vec<i32> = Vec::new();
+    test.push(100);
+    test.push(5);
+    test.push(7);
+    let encoded = test.to_bencode();
+    println!("{:?}", encoded);
+    println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
+
 
     /*
     let mut a = BencodeArray::new();
