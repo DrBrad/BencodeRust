@@ -7,17 +7,21 @@ mod variables;
 
 
 fn main() {
-    /*
     let test = "blank";
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
-    println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
-    */
+    //println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
 
+    //let bytes: &[u8] = b"hello";
+    let decoded = String::from_bencode(&encoded);
+    println!("{}", decoded);
+
+    /*
     let test = 100.56;
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
     println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
+    */
 
     /*
     let mut test: Vec<String> = Vec::new();
@@ -37,6 +41,7 @@ fn main() {
     println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
     */
 
+
     let mut n = BTreeMap::new();
     n.insert("hello", STRING("world".to_string()));
     n.insert("hello2z", STRING("world5z".to_string()));
@@ -46,11 +51,6 @@ fn main() {
     let encoded = n.to_bencode();
     println!("{:?}", encoded);
     println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
-
-
-    let x: &[u8] = b"hello world";
-    let decoded = String::from_bencode(x);
-    println!("{}", decoded);
 
     /*
     let mut a = BencodeArray::new();
