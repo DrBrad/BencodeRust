@@ -22,7 +22,7 @@ impl ToBencode for &str {
     }
 }
 
-macro_rules! impl_encodable_integer {
+macro_rules! impl_encodable_number {
     ($($type:ty)*) => {$(
         impl ToBencode for $type {
 
@@ -33,7 +33,7 @@ macro_rules! impl_encodable_integer {
     )*}
 }
 
-impl_encodable_integer!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
+impl_encodable_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
 
 macro_rules! impl_encodable_iterable {
     ($($type:ident)*) => {$(

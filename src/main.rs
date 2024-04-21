@@ -23,7 +23,9 @@ fn main() {
     println!("{:?}", encoded);
     //println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
 
-    //let bytes: &[u8] = b"hello";
+    //let decoded = f32::from_bencode(&encoded);
+    //println!("{}", decoded);
+
     let decoded = f32::from_bencode(&encoded);
     println!("{}", decoded);
 
