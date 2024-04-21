@@ -1,8 +1,10 @@
+use std::fmt::Display;
 
 pub fn decode_string(buf: &Vec<u8>, mut off: usize) -> String {
     let mut len_bytes = [0; 8];
     let start = off;
 
+    //USE DELIMITER
     while buf[off] != b':' {
         len_bytes[off - start] = buf[off];
         off += 1;
@@ -14,9 +16,24 @@ pub fn decode_string(buf: &Vec<u8>, mut off: usize) -> String {
     String::from_utf8_lossy(string_bytes).into_owned()
 }
 
-pub fn decode_number(buf: &Vec<u8>, mut off: usize) -> usize /*ANY NUMBER...*/ {
+pub fn decode_number<T: std::str::FromStr>(buf: &Vec<u8>, mut off: usize) -> T {
+    let mut c = [0 as char; 32];
+    let mut off = off + 1;
+    let s = off;
 
-    6
+    //type.get_suffix()
+    while buf[off] != b'e' {
+        c[off - s] = buf[off] as char;
+        off += 1;
+    }
+
+    let number_str = std::str::from_utf8(&buf[s..off])
+        .unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
+
+    match number_str.parse::<T>() {
+        Ok(number) => number,
+        Err(_) => panic!("Number is invalid."),
+    }
 }
 
 

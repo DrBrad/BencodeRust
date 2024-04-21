@@ -26,8 +26,9 @@ fn main() {
     //let decoded = f32::from_bencode(&encoded);
     //println!("{}", decoded);
 
-    let decoded = f32::from_bencode(&encoded);
+    let mut decoded = f32::from_bencode(&encoded);
     println!("{}", decoded);
+
 
     /*
     let mut test: Vec<String> = Vec::new();
