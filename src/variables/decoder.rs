@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::str::{FromStr, from_utf8};
 
 pub fn decode_string(buf: &Vec<u8>, mut off: usize) -> String {
     let mut len_bytes = [0; 8];
@@ -16,7 +17,7 @@ pub fn decode_string(buf: &Vec<u8>, mut off: usize) -> String {
     String::from_utf8_lossy(string_bytes).into_owned()
 }
 
-pub fn decode_number<T: std::str::FromStr>(buf: &Vec<u8>, mut off: usize) -> T {
+pub fn decode_number<T: FromStr>(buf: &Vec<u8>, mut off: usize) -> T {
     let mut c = [0 as char; 32];
     let mut off = off + 1;
     let s = off;
@@ -27,13 +28,11 @@ pub fn decode_number<T: std::str::FromStr>(buf: &Vec<u8>, mut off: usize) -> T {
         off += 1;
     }
 
-    let number_str = std::str::from_utf8(&buf[s..off])
-        .unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
+    let number_str = from_utf8(&buf[s..off]).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
 
     match number_str.parse::<T>() {
         Ok(number) => number,
         Err(_) => panic!("Number is invalid."),
     }
 }
-
 
