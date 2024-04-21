@@ -1,7 +1,6 @@
 use std::collections::{BTreeMap, HashMap};
-use crate::Value::NUMBER;
-use crate::Value::STRING;
 use crate::variables::to_bencode::ToBencode;
+use crate::variables::to_bencode::Value::{NUMBER, STRING};
 
 mod variables;
 
@@ -41,7 +40,7 @@ fn main() {
     n.insert("hello", STRING("world".to_string()));
     n.insert("hello2z", STRING("world5z".to_string()));
     n.insert("hello3z", STRING("world6z".to_string()));
-    n.insert("yo", NUMBER(123));
+    n.insert("yo", NUMBER(123.56));
 
     let encoded = n.to_bencode();
     println!("{:?}", encoded);
@@ -81,9 +80,5 @@ fn main() {
     //assert_eq!(b"i21e", encoded.as_slice());
 }
 
-pub enum Value {
-    STRING(String),
-    NUMBER(u32)
-}
 
 

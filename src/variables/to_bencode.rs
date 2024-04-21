@@ -1,4 +1,5 @@
 use std::collections::{BTreeMap, HashMap, LinkedList, VecDeque};
+use std::fmt::Display;
 use std::hash::{BuildHasher, Hash};
 use super::encoder::{encode_number, encode_string};
 
@@ -91,7 +92,20 @@ impl<K, V, S> ToBencode for HashMap<K, V, S> where K: ToBencode, V: ToBencode, S
 }
 
 
+pub enum Value<T> {
+    STRING(String),
+    NUMBER(T)
+}
 
+impl<T: Display> ToBencode for Value<T> {
+
+    fn to_bencode(&self) -> Vec<u8> {
+        match self {
+            Value::STRING(v) => encode_string(v),
+            Value::NUMBER(v) => encode_number(v)
+        }
+    }
+}
 
 
 
