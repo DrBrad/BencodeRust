@@ -12,7 +12,7 @@ fn main() {
     println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
     */
 
-    let test = 100;
+    let test = 100.56;
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
     println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
@@ -39,6 +39,7 @@ fn main() {
     n.insert("hello", "world");
     n.insert("hello2z", "world5z");
     n.insert("hello3z", "world6z");
+    //n.insert("yo", 123);
 
     let encoded = n.to_bencode();
     println!("{:?}", encoded);
