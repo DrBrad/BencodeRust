@@ -8,6 +8,6 @@ pub trait FromBencode {
 impl FromBencode for String {
 
     fn from_bencode(b: &Vec<u8>) -> Self {
-        decode_string(b).to_string()
+        decode_string(b, 0).to_string()
     }
 }
