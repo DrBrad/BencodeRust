@@ -27,8 +27,9 @@ fn main() {
     //let decoded = f32::from_bencode(&encoded);
     //println!("{}", decoded);
 
-    let mut decoded = f32::from_bencode(&encoded);
+    let decoded = f32::from_bencode(&encoded);
     println!("{}", decoded);
+    println!("{}", encoded.len());
 
 
     /*

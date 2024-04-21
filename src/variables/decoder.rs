@@ -29,6 +29,28 @@ impl Decoder {
 
         String::from_utf8_lossy(string_bytes).into_owned()
     }
+
+    pub fn decode_number<T: FromStr>(&mut self, buf: &Vec<u8>) -> T {
+        let mut c = [0 as char; 32];
+        self.off += 1;
+        let s = self.off;
+
+        //type.get_suffix()
+        while buf[self.off] != b'e' {
+            c[self.off - s] = buf[self.off] as char;
+            self.off += 1;
+        }
+
+        let number_str = from_utf8(&buf[s..self.off]).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
+
+        self.off += 1;
+
+
+        match number_str.parse::<T>() {
+            Ok(number) => number,
+            Err(_) => panic!("Number is invalid."),
+        }
+    }
 }
 
 /*

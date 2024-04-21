@@ -23,7 +23,12 @@ macro_rules! impl_decodable_number {
         impl FromBencode for $type {
 
             fn from_bencode(b: &Vec<u8>) -> Self {
-                0 as $type
+
+                let mut dec = Decoder::new();
+                let s = dec.decode_number(b);
+                println!("{}", dec.off);
+                s
+                //0 as $type
                 //decode_number::<$type>(b, 0)
             }
         }
