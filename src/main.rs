@@ -1,5 +1,6 @@
 use std::collections::{BTreeMap, HashMap};
 use crate::variables::to_bencode::ToBencode;
+use crate::variables::from_bencode::FromBencode;
 use crate::variables::to_bencode::Value::{NUMBER, STRING};
 
 mod variables;
@@ -47,6 +48,7 @@ fn main() {
     println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
 
 
+    //let decoded = String::from_bencode(encoded);
 
     /*
     let mut a = BencodeArray::new();
