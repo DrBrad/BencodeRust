@@ -48,7 +48,9 @@ fn main() {
     println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
 
 
-    //let decoded = String::from_bencode(encoded);
+    let x: &[u8] = b"hello world";
+    let decoded = String::from_bencode(x);
+    println!("{}", decoded);
 
     /*
     let mut a = BencodeArray::new();

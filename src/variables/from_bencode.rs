@@ -1,7 +1,7 @@
 
 pub trait FromBencode {
 
-    fn from_bencode(&self, b: &[u8]);
+    fn from_bencode(&self, b: &[u8]) -> Self;
 }
 
 impl FromBencode for String {
