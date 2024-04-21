@@ -17,13 +17,40 @@ macro_rules! impl_decodable_integer {
         impl FromBencode for $type {
 
             fn from_bencode(b: &Vec<u8>) -> Self {
+                //CHECK PREFIX
+
+                let mut off = 0;
+
+                let mut c = [0 as char; 32];
+                let mut off = off + 1;
+                let s = off;
+
+                //type.get_suffix()
+                while b[off] != b'e' {
+                    c[off - s] = b[off] as char;
+                    off += 1;
+                }
+
+
+                // Convert the byte slice to string
+                let number_str = std::str::from_utf8(&b[s..off])
+                    .unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
+
+                // Parse the string into the desired number type
+                match number_str.parse::<$type>() {
+                    Ok(number) => number,
+                    Err(_) => panic!("Number is invalid."),
+                }
+
+                //number
+
                 /*
                 let content = object.try_into_integer()?;
                 let number = content.parse::<$type>()?;
 
                 number
                 */
-                100 as $type
+                //100 as $type
             }
         }
     )*}
