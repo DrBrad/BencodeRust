@@ -15,6 +15,7 @@ fn main() {
     //let bytes: &[u8] = b"hello";
     let decoded = String::from_bencode(&encoded);
     println!("{}", decoded);
+    println!("{}", encoded.len());
 
 
 
@@ -49,6 +50,7 @@ fn main() {
     */
 
 
+    /*
     let mut n = BTreeMap::new();
     n.insert("hello", STRING("world".to_string()));
     n.insert("hello2z", STRING("world5z".to_string()));
@@ -65,9 +67,10 @@ fn main() {
     l.push("this is a test");
     let encoded = l.to_bencode();
     println!("{:?}", encoded);
+    */
 
-    let decoded = Vec::encoded.from_bencode();
-    println!("{}", decoded);
+    //let decoded = Vec::encoded.from_bencode();
+    //println!("{}", decoded);
 
 
 

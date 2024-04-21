@@ -1,5 +1,6 @@
 use std::collections::{LinkedList, VecDeque};
-use crate::variables::decoder::{decode_number, decode_string};
+use crate::variables::decoder::{Decoder};
+use crate::variables::to_bencode::ToBencode;
 
 pub trait FromBencode {
 
@@ -9,7 +10,11 @@ pub trait FromBencode {
 impl FromBencode for String {
 
     fn from_bencode(b: &Vec<u8>) -> Self {
-        decode_string(b, 0).to_string()
+        let mut dec = Decoder::new();
+        let s = dec.decode_string(b);
+        println!("{}", dec.off);
+        s
+        //decode_string(b, 0).to_string()
     }
 }
 
@@ -18,7 +23,8 @@ macro_rules! impl_decodable_number {
         impl FromBencode for $type {
 
             fn from_bencode(b: &Vec<u8>) -> Self {
-                decode_number::<$type>(b, 0)
+                0 as $type
+                //decode_number::<$type>(b, 0)
             }
         }
     )*}
@@ -26,10 +32,11 @@ macro_rules! impl_decodable_number {
 
 impl_decodable_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
 
+/*
 macro_rules! impl_decodable_iterable {
     ($($type:ident)*) => {
         $(
-            impl<ContentT> FromBencode for $type<ContentT> where ContentT: FromBencode {
+            impl<ContentT> FromBencode for $type<ContentT> where ContentT: FromBencode + ToBencode {
 
                 fn from_bencode(b: &Vec<u8>) -> Self {
                     let mut off = 0;
@@ -62,5 +69,5 @@ macro_rules! impl_decodable_iterable {
 }
 
 impl_decodable_iterable!(Vec VecDeque LinkedList);
-
+*/
 
