@@ -1,3 +1,4 @@
+use std::collections::{LinkedList, VecDeque};
 use crate::variables::decoder::{decode_number, decode_string};
 
 pub trait FromBencode {
@@ -25,30 +26,41 @@ macro_rules! impl_decodable_number {
 
 impl_decodable_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
 
+macro_rules! impl_decodable_iterable {
+    ($($type:ident)*) => {
+        $(
+            impl<ContentT> FromBencode for $type<ContentT> where ContentT: FromBencode {
 
+                fn from_bencode(b: &Vec<u8>) -> Self {
+                    let mut off = 0;
 
+                    // Ensure the buffer starts with 'l'
+                    if b.get(0) != Some(&b'l') {
+                        panic!("Invalid Bencode list");
+                    }
 
+                    off += 1; // Move past the 'l'
 
-/*
-macro_rules! impl_decodabl_iterable {
-    ($($type:ident)*) => {$(
-        impl <ContentT> ToBencode for $type<ContentT> where ContentT: ToBencode {
+                    let mut decoded_list = $type::new(); // Create the collection
 
-            fn to_bencode(&self) -> Vec<u8> {
-                let mut r: Vec<u8> = Vec::new();
-                r.push(b'l');
+                    // Continue until we find the list terminator 'e'
+                    while let Some(&next) = b.get(off) {
+                        if next == b'e' {
+                            return decoded_list; // End of list, return the decoded collection
+                        }
 
-                for item in self {
-                    r.extend_from_slice(&item.to_bencode());
+                        let item = ContentT::from_bencode(&b[off..].to_vec()); // Decode the item
+                        decoded_list.push(item); // Add the item to the collection
+                        off += item.to_bencode().len(); // Move past the decoded item
+                    }
+
+                    panic!("Invalid Bencode list"); // If we reach here, the list is malformed
                 }
-
-                r.push(b'e');
-                r
             }
-        }
-    )*}
+        )*
+    };
 }
 
-impl_decodabl_iterable!(Vec VecDeque LinkedList);
-*/
+impl_decodable_iterable!(Vec VecDeque LinkedList);
+
 

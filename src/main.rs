@@ -59,6 +59,18 @@ fn main() {
     println!("{:?}", encoded);
     println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
 
+    let mut l = Vec::new();
+    l.push("100");
+    l.push("yo yo");
+    l.push("this is a test");
+    let encoded = l.to_bencode();
+    println!("{:?}", encoded);
+
+    let decoded = Vec::encoded.from_bencode();
+    println!("{}", decoded);
+
+
+
     /*
     let mut a = BencodeArray::new();
     a.add(BencodeNumber::from(100));
@@ -90,6 +102,3 @@ fn main() {
     //let encoded = 21.to_bencode()?;
     //assert_eq!(b"i21e", encoded.as_slice());
 }
-
-
-
