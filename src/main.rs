@@ -1,4 +1,6 @@
 use std::collections::{BTreeMap, HashMap};
+use crate::Value::NUMBER;
+use crate::Value::STRING;
 use crate::variables::to_bencode::ToBencode;
 
 mod variables;
@@ -36,10 +38,10 @@ fn main() {
     */
 
     let mut n = BTreeMap::new();
-    n.insert("hello", "world");
-    n.insert("hello2z", "world5z");
-    n.insert("hello3z", "world6z");
-    //n.insert("yo", 123);
+    n.insert("hello", STRING("world".to_string()));
+    n.insert("hello2z", STRING("world5z".to_string()));
+    n.insert("hello3z", STRING("world6z".to_string()));
+    n.insert("yo", NUMBER(123));
 
     let encoded = n.to_bencode();
     println!("{:?}", encoded);
@@ -79,36 +81,9 @@ fn main() {
     //assert_eq!(b"i21e", encoded.as_slice());
 }
 
-
-/*
-
-pub trait ToBencode2 {
-    /// The maximum depth that this object could encode to. Leaves do not consume a level, so an
-    /// `i1e` has depth 0 and `li1ee` has depth 1.
-    //const MAX_DEPTH: usize;
-
-    /// Encode this object into the bencode stream
-    fn encode(&self, encoder: SingleItemEncoder);// -> Result<(), Error>;
-
-    /// Encode this object to a byte string
-    fn to_bencode2(&self) -> Vec<u8> {
-        Vec::new()
-        //let mut encoder = Encoder::new().with_max_depth(Self::MAX_DEPTH);
-        //encoder.emit_with(|e| self.encode(e).map_err(Error::into))?;
-
-        //let bytes = encoder.get_output()?;
-        //Ok(bytes)
-    }
+pub enum Value {
+    STRING(String),
+    NUMBER(u32)
 }
-
-impl<'a> ToBencode2 for &'a str {
-
-    fn encode(&self, encoder: SingleItemEncoder) {
-        //encoder.emit_str(self).map_err(Error::from)
-    }
-}
-*/
-
-
 
 
