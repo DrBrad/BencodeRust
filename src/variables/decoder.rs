@@ -13,3 +13,10 @@ pub fn decode_string(buf: &Vec<u8>, mut off: usize) -> String {
 
     String::from_utf8_lossy(string_bytes).into_owned()
 }
+
+pub fn decode_number(buf: &Vec<u8>, mut off: usize) -> usize /*ANY NUMBER...*/ {
+
+    6
+}
+
+
