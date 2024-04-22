@@ -1,5 +1,6 @@
 use std::collections::{BTreeMap, HashMap, LinkedList, VecDeque};
 use std::hash::BuildHasher;
+use crate::variables::from_bencode::FromBencode;
 use crate::variables::inter::bencode_type::BencodeType;
 
 pub trait ToBencode {
@@ -10,6 +11,7 @@ pub trait ToBencode {
 }
 
 impl ToBencode for String {
+
     const TYPE: BencodeType = BencodeType::BYTES;
 
     fn to_bencode(&self) -> Vec<u8> {
@@ -17,7 +19,7 @@ impl ToBencode for String {
         let z = self.as_bytes();
 
         r.extend_from_slice(z.len().to_string().as_bytes());
-        r.push(Self::TYPE.delimiter() as u8);
+        r.push(<String as ToBencode>::TYPE.delimiter() as u8);
         r.extend_from_slice(z);
         r
     }
@@ -32,7 +34,7 @@ impl ToBencode for &str {
         let z = self.as_bytes();
 
         r.extend_from_slice(z.len().to_string().as_bytes());
-        r.push(Self::TYPE.delimiter() as u8);
+        r.push(<&str as ToBencode>::TYPE.delimiter() as u8);
         r.extend_from_slice(z);
         r
     }
@@ -46,7 +48,7 @@ impl ToBencode for &[u8] {
         let mut r: Vec<u8> = Vec::new();
 
         r.extend_from_slice(self.len().to_string().as_bytes());
-        r.push(Self::TYPE.delimiter() as u8);
+        r.push(<&[u8] as ToBencode>::TYPE.delimiter() as u8);
         r.extend_from_slice(self);
         r
     }
@@ -60,7 +62,7 @@ macro_rules! impl_encodable_number {
                 const TYPE: BencodeType = BencodeType::NUMBER;
 
                 fn to_bencode(&self) -> Vec<u8> {
-                    format!("{}{}{}", Self::TYPE.prefix(), self, Self::TYPE.suffix()).into_bytes()
+                    format!("{}{}{}", <$type as ToBencode>::TYPE.prefix(), self, <$type as ToBencode>::TYPE.suffix()).into_bytes()
                 }
             }
         )*
@@ -78,13 +80,13 @@ macro_rules! impl_encodable_iterable {
 
                 fn to_bencode(&self) -> Vec<u8> {
                     let mut buf: Vec<u8> = Vec::new();
-                    buf.push(Self::TYPE.prefix() as u8);
+                    buf.push(<$type<ContentT> as ToBencode>::TYPE.prefix() as u8);
 
                     for item in self {
                         buf.extend_from_slice(&item.to_bencode());
                     }
 
-                    buf.push(Self::TYPE.suffix() as u8);
+                    buf.push(<$type<ContentT> as ToBencode>::TYPE.suffix() as u8);
                     buf
                 }
             }
@@ -103,7 +105,7 @@ impl<K, V> ToBencode for BTreeMap<K, V> where K: ToBencode, V: ToBencode {
 
     fn to_bencode(&self) -> Vec<u8> {
         let mut buf: Vec<u8> = Vec::new();
-        buf.push(Self::TYPE.prefix() as u8);
+        buf.push(<BTreeMap<K, V> as ToBencode>::TYPE.prefix() as u8);
         buf.push(b'd');
 
         for (key, value) in self {
@@ -111,7 +113,7 @@ impl<K, V> ToBencode for BTreeMap<K, V> where K: ToBencode, V: ToBencode {
             buf.extend_from_slice(&value.to_bencode());
         }
 
-        buf.push(Self::TYPE.suffix() as u8);
+        buf.push(<BTreeMap<K, V> as ToBencode>::TYPE.suffix() as u8);
         buf
     }
 }
@@ -122,14 +124,14 @@ impl<K, V, S> ToBencode for HashMap<K, V, S> where K: ToBencode, V: ToBencode, S
 
     fn to_bencode(&self) -> Vec<u8> {
         let mut buf: Vec<u8> = Vec::new();
-        buf.push(b'd');
+        buf.push(<HashMap<K, V, S> as ToBencode>::TYPE.prefix() as u8);
 
         for (key, value) in self {
             buf.extend_from_slice(&key.to_bencode());
             buf.extend_from_slice(&value.to_bencode());
         }
 
-        buf.push(b'e');
+        buf.push(<HashMap<K, V, S> as ToBencode>::TYPE.suffix() as u8);
         buf
     }
 }

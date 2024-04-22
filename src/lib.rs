@@ -11,7 +11,7 @@ mod tests {
     use std::collections::HashMap;
     use crate::variables::to_bencode::ToBencode;
     use crate::variables::from_bencode::FromBencode;
-    use crate::variables::inter::bencode_variable::BencodeBytes;
+    use crate::variables::bencode_bytes::BencodeBytes;
 
     #[test]
     fn main() {
