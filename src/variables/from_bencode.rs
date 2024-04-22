@@ -1,4 +1,5 @@
-use std::collections::{LinkedList, VecDeque};
+use std::collections::{HashMap, LinkedList, VecDeque};
+use std::hash::{BuildHasher, Hash};
 //use crate::variables::decoder::{Decoder};
 use std::str::from_utf8;
 use crate::variables::inter::bencode_type::BencodeType;
@@ -16,7 +17,7 @@ pub enum BencodeVariable<'obj, 'ser: 'obj> {
 */
 pub trait FromBencode {
 
-    fn from_bencode(b: &Vec<u8>, off: &mut usize) -> Self;
+    fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self;
 }
 
 impl FromBencode for String {
@@ -131,6 +132,46 @@ macro_rules! impl_decodable_iterable {
 }
 
 impl_decodable_iterable!(Vec);// VecDeque LinkedList);
+
+impl<K, V, S> FromBencode for HashMap<K, V, S> where K: FromBencode + Eq + Hash, V: FromBencode, S: BuildHasher + Default {
+
+    fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
+        if BencodeType::type_by_prefix(buf[*off] as char) != BencodeType::OBJECT {
+            panic!("Buffer is not a bencode array.");
+        }
+
+        *off += 1;
+
+        let mut res = HashMap::<K, V, S>::with_hasher(Default::default());
+
+        while buf[*off] != b'e' {
+            //for off in 1..buf.len()-1 {
+
+            let key = K::from_bencode(buf, off);
+
+            let type_ = BencodeType::type_by_prefix(buf[*off] as char);
+
+            let value = match type_ {
+                BencodeType::NUMBER => V::from_bencode(buf, off),
+                BencodeType::BYTES => V::from_bencode(buf, off),
+                _ => unimplemented!()
+            };
+
+
+            //MOVE BELOW INTO A DIFFERENT FUNCTION...
+
+            res.insert(key, value);
+        }
+
+        res
+    }
+}
+
+
+
+
+
+
 
 
 //ATTEMPT 2

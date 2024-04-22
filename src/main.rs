@@ -1,9 +1,12 @@
+use std::collections::HashMap;
 //use std::collections::{BTreeMap, HashMap};
 use crate::variables::to_bencode::ToBencode;
 use crate::variables::from_bencode::FromBencode;
-use crate::variables::to_bencode::Value::{NUMBER, STRING};
 
 mod variables;
+mod utils;
+
+
 
 fn main() {
     //STRING TEST
@@ -28,6 +31,7 @@ fn main() {
 
 
 
+    /*
     //LIST TEST
 
     let mut vec = Vec::new();
@@ -43,4 +47,21 @@ fn main() {
     for item in decoded {
         println!("{}", item);
     }
+
+
+
+    //DICTIONARY TEST
+
+    let mut dic = HashMap::new();
+    dic.insert("hello", "123123");
+    dic.insert("bloop", "poop");
+    let encoded = dic.to_bencode();
+    println!("{:?}", encoded);
+    let mut off = 0;
+    let decoded = HashMap::<String, String>::from_bencode(&encoded, &mut off);
+
+    for (key, value) in decoded.iter() {
+        println!("Key: {}, Value: {}", key, value);
+    }
+    */
 }
