@@ -2,7 +2,7 @@ use crate::variables::from_bencode::FromBencode;
 use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, Hash, PartialEq)]
 pub struct ByteWrapper(pub Vec<u8>);
 
 impl ByteWrapper {

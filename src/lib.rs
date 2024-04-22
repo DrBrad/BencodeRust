@@ -7,12 +7,21 @@ mod tests {
     use crate::variables::to_bencode::ToBencode;
     use crate::variables::from_bencode::FromBencode;
     use crate::variables::bencode_byte_wrapper::ByteWrapper;
+    use crate::variables::bencode_object::BencodeObject;
 
     #[test]
     fn main() {
+        let mut s = BencodeObject(HashMap::new());
+        s.0.insert(ByteWrapper("hello".as_bytes().to_vec()), ByteWrapper("world".as_bytes().to_vec()));
+
+        println!("{:?}", s.to_bencode());
+
+
         let original = ByteWrapper("blank test".as_bytes().to_vec());
         let encoded = original.to_bencode();
         let decoded = ByteWrapper::from_bencode(&encoded, &mut 0);
+
+        println!("{}", decoded.as_string());
 
         assert_eq!(original, decoded);
 
