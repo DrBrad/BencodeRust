@@ -29,10 +29,9 @@ use crate::variables::to_bencode::ToBencode;
 use crate::variables::from_bencode::FromBencode;
 
 fn main() {
-    //STRING TEST
-
     let encoded = "blank test".to_bencode();
     println!("{:?}", encoded);
+
     let decoded = String::from_bencode(&encoded, &mut 0);
     println!("{}", decoded);
 }
