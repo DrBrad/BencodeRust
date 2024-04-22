@@ -16,6 +16,7 @@ impl FromBencode for String {
     const TYPE: BencodeType = BencodeType::BYTES;
 
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
+        println!("{}", buf[*off] as char);
         if BencodeType::type_by_prefix(buf[*off] as char) != <String as FromBencode>::TYPE {
             panic!("Buffer is not a bencode bytes / string.");
         }
@@ -24,6 +25,7 @@ impl FromBencode for String {
         let start = *off;
 
         while buf[*off] != <String as FromBencode>::TYPE.delimiter() as u8 {
+            //TYPES NEED TO BE DEFINED HERE...
             len_bytes[*off - start] = buf[*off];
             *off += 1;
         }
