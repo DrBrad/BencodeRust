@@ -16,8 +16,6 @@ impl<V> BencodeArray<V> {//: ToBencode + FromBencode
 
 impl<V> FromBencode for BencodeArray<V> where V: FromBencode {
 
-    const TYPE: BencodeType = BencodeType::ARRAY;
-
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
         let mut res = Vec::<V>::new();
 
@@ -27,8 +25,6 @@ impl<V> FromBencode for BencodeArray<V> where V: FromBencode {
 }
 
 impl<V> ToBencode for BencodeArray<V> where V: ToBencode {
-    
-    const TYPE: BencodeType = BencodeType::ARRAY;
 
     fn to_bencode(&self) -> Vec<u8> {
         Vec::new()

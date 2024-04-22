@@ -16,8 +16,6 @@ impl<V> BencodeObject<V> {//: ToBencode + FromBencode
 
 impl<V> FromBencode for BencodeObject<V> where V: FromBencode {
 
-    const TYPE: BencodeType = BencodeType::OBJECT;
-
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
         if BencodeType::type_by_prefix(buf[*off] as char) != Self::TYPE {
             panic!("Buffer is not a bencode array.");
@@ -47,8 +45,6 @@ impl<V> FromBencode for BencodeObject<V> where V: FromBencode {
 }
 
 impl<V> ToBencode for BencodeObject<V> where V: ToBencode {
-
-    const TYPE: BencodeType = BencodeType::OBJECT;
 
     fn to_bencode(&self) -> Vec<u8> {
         let mut buf: Vec<u8> = Vec::new();

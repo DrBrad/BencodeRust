@@ -6,7 +6,7 @@ use crate::variables::inter::bencode_type::BencodeType;
 
 pub trait FromBencode {
 
-    const TYPE: BencodeType;
+    //const TYPE: BencodeType;
 
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self;
 }

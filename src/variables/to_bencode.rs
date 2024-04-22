@@ -5,7 +5,7 @@ use crate::variables::inter::bencode_type::BencodeType;
 
 pub trait ToBencode {
 
-    const TYPE: BencodeType;
+    //const TYPE: BencodeType;
 
     fn to_bencode(&self) -> Vec<u8>;
 }

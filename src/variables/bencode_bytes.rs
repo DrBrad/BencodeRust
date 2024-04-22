@@ -7,6 +7,8 @@ pub struct BencodeBytes(pub Vec<u8>);
 
 impl BencodeBytes {
 
+    const TYPE: BencodeType = BencodeType::BYTES;
+
     pub fn as_string(&self) -> String {
         String::from_utf8(self.0.clone()).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"))
     }
@@ -14,17 +16,15 @@ impl BencodeBytes {
 
 impl FromBencode for BencodeBytes {
 
-    const TYPE: BencodeType = BencodeType::BYTES;
-
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
-        if BencodeType::type_by_prefix(buf[*off] as char) != <BencodeBytes as FromBencode>::TYPE {
+        if BencodeType::type_by_prefix(buf[*off] as char) != Self::TYPE {
             panic!("Buffer is not a bencode bytes / string.");
         }
 
         let mut len_bytes = [0; 8];
         let start = *off;
 
-        while buf[*off] != <BencodeBytes as FromBencode>::TYPE.delimiter() as u8 {
+        while buf[*off] != Self::TYPE.delimiter() as u8 {
             len_bytes[*off - start] = buf[*off];
             *off += 1;
         }
@@ -40,13 +40,11 @@ impl FromBencode for BencodeBytes {
 
 impl ToBencode for BencodeBytes {
 
-    const TYPE: BencodeType = BencodeType::BYTES;
-
     fn to_bencode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::new();
 
         r.extend_from_slice(self.0.len().to_string().as_bytes());
-        r.push(<BencodeBytes as ToBencode>::TYPE.delimiter() as u8);
+        r.push(Self::TYPE.delimiter() as u8);
         r.extend(self.0.clone());
         r
     }
