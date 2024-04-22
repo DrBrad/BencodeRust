@@ -28,9 +28,13 @@ fn main() {
     let encoded = vec.to_bencode();
     println!("{:?}", encoded);
     let mut off = 0;
-    let decoded = Vec::from_bencode(&encoded, &mut off);
+    let decoded = Vec::<String>::from_bencode(&encoded, &mut off);
     //println!("{}", decoded.get(0));
     println!("{}", off);
+
+    for item in decoded {
+        println!("{}", item);
+    }
 
 
 
