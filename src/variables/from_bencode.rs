@@ -1,6 +1,7 @@
-use std::collections::{HashMap, LinkedList, VecDeque};
+use std::collections::{BTreeMap, HashMap, LinkedList, VecDeque};
 use std::hash::{BuildHasher, Hash};
 use std::str::from_utf8;
+use std::cmp::Ord;
 use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
@@ -147,6 +148,40 @@ macro_rules! impl_decodable_iterable {
 
 impl_decodable_iterable!(VecDeque LinkedList);
 
+
+impl<K, V> FromBencode for BTreeMap<K, V> where K: FromBencode + Eq + Hash + Ord, V: FromBencode {
+
+    const TYPE: BencodeType = BencodeType::OBJECT;
+
+    fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
+        if BencodeType::type_by_prefix(buf[*off] as char) != <BTreeMap<K, V> as FromBencode>::TYPE {
+            panic!("Buffer is not a bencode array.");
+        }
+
+        *off += 1;
+
+        let mut res = BTreeMap::<K, V>::new();
+
+        while buf[*off] != <BTreeMap<K, V> as FromBencode>::TYPE.suffix() as u8 {
+            //for off in 1..buf.len()-1 {
+
+            let key = K::from_bencode(buf, off);
+
+            let type_ = BencodeType::type_by_prefix(buf[*off] as char);
+
+            let value = match type_ {
+                BencodeType::NUMBER => V::from_bencode(buf, off),
+                BencodeType::BYTES => V::from_bencode(buf, off),
+                _ => unimplemented!()
+            };
+
+            res.insert(key, value);
+        }
+
+        res
+    }
+}
+
 impl<K, V, S> FromBencode for HashMap<K, V, S> where K: FromBencode + Eq + Hash, V: FromBencode, S: BuildHasher + Default {
 
     const TYPE: BencodeType = BencodeType::OBJECT;
@@ -172,9 +207,6 @@ impl<K, V, S> FromBencode for HashMap<K, V, S> where K: FromBencode + Eq + Hash,
                 BencodeType::BYTES => V::from_bencode(buf, off),
                 _ => unimplemented!()
             };
-
-
-            //MOVE BELOW INTO A DIFFERENT FUNCTION...
 
             res.insert(key, value);
         }
