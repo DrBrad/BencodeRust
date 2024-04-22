@@ -25,6 +25,23 @@ impl BencodeBytes {
 
 
 
+pub struct BencodeNumber<T> {
+    pub(crate) size: usize,
+    pub(crate) num: T
+}
+
+
+
+impl<T> BencodeNumber<T> {
+
+    /*
+    pub fn new() -> Self {
+        Self {
+            size: 0,
+            num: T
+        }
+    }*/
+}
 
 
 
@@ -57,6 +74,71 @@ impl FromBencode for BencodeBytes {
         }
     }
 }
+
+macro_rules! impl_decodable_number {
+    ($($type:ty)*) => {$(
+        /*
+        impl FromBencode for $type {
+
+            fn from_bencode(buf: &Vec<u8>) -> Self {
+                Decoder::new().decode_number(buf)
+            }
+        }
+        */
+
+
+
+        impl FromBencode for BencodeNumber<$type> {
+
+            fn from_bencode(buf: &Vec<u8>) -> Self {
+                let mut c = [0 as char; 32];
+                let mut off = 1;
+                let s = off;
+
+                //type.get_suffix()
+                while buf[off] != b'e' {
+                    c[off - s] = buf[off] as char;
+                    off += 1;
+                }
+
+                let number_str = std::str::from_utf8(&buf[s..off]).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
+
+
+                let num = match number_str.parse::<$type>() {
+                    Ok(number) => number,
+                    Err(_) => panic!("Number is invalid."),
+                };
+
+                off += 1;
+
+                Self {
+                    size: off,
+                    num: num
+                }
+            }
+        }
+
+
+
+
+
+
+
+    )*}
+}
+
+impl_decodable_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
+
+
+
+
+
+
+
+
+
+
+
 
 /*
 pub trait FromBencode {
