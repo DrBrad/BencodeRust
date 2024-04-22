@@ -23,7 +23,7 @@ impl BencodeType {
             BencodeType::OBJECT => 'd',
             BencodeType::ARRAY => 'l',
             BencodeType::BYTES => '\0',
-            BencodeType::INVALID => '\0'
+            _ => '\0'
         }
     }
 
