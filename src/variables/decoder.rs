@@ -1,6 +1,9 @@
 use std::fmt::Display;
 use std::str::{FromStr, from_utf8};
 
+
+
+/*
 pub struct Decoder {
     pub(crate) off: usize
 }
@@ -52,6 +55,7 @@ impl Decoder {
         }
     }
 }
+*/
 
 /*
 pub fn decode_string(buf: &Vec<u8>, mut off: usize) -> String {

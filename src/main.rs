@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, HashMap};
 use crate::variables::to_bencode::ToBencode;
-use crate::variables::from_bencode::FromBencode;
+use crate::variables::from_bencode::{BencodeBytes, FromBencode};
 use crate::variables::to_bencode::Value::{NUMBER, STRING};
 
 mod variables;
@@ -11,11 +11,14 @@ fn main() {
     let test = "blank test";
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
-    let decoded = String::from_bencode(&encoded);
-    println!("{}", decoded);
+    let decoded = BencodeBytes::from_bencode(&encoded);
+    println!("{}", decoded.as_string());
+    println!("{}", decoded.size);
+    println!("{}", encoded.len());
 
 
 
+    /*
     let test = 100.56;
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
@@ -36,6 +39,7 @@ fn main() {
     for item in decoded {
         println!("{}", item);
     }
+    */
 
 
 

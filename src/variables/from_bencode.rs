@@ -1,15 +1,76 @@
 use std::collections::{LinkedList, VecDeque};
-use crate::variables::decoder::{Decoder};
+//use crate::variables::decoder::{Decoder};
 use crate::variables::to_bencode::ToBencode;
+
+
+pub struct BencodeBytes {
+    pub(crate) size: usize,
+    pub(crate) buf: Vec<u8>
+}
+
+
+impl BencodeBytes {
+
+    pub fn new() -> Self {
+        Self {
+            size: 0,
+            buf: Vec::new()
+        }
+    }
+
+    pub fn as_string(&self) -> String {
+        String::from_utf8_lossy(&self.buf).into_owned()
+    }
+}
+
+
+
+
+
+
 
 pub trait FromBencode {
 
     fn from_bencode(b: &Vec<u8>) -> Self;
 }
 
-impl FromBencode for String {
+impl FromBencode for BencodeBytes {
 
     fn from_bencode(buf: &Vec<u8>) -> Self {
+        let mut len_bytes = [0; 8];
+        let start = 0;
+        let mut off = 0;
+
+        while buf[off] != b':' {
+            len_bytes[off - start] = buf[off];
+            off += 1;
+        }
+
+        let length = len_bytes.iter().take(off - start).fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
+        let string_bytes = &buf[off + 1..off + 1 + length];
+
+        off += 1+length;
+
+        Self {
+            size: off,
+            buf: string_bytes.to_vec()
+        }
+    }
+}
+
+/*
+pub trait FromBencode {
+
+    const size: usize;
+
+    fn from_bencode(b: &Vec<u8>) -> Self;
+}
+
+impl FromBencode for String {
+    const size;
+
+    fn from_bencode(buf: &Vec<u8>) -> Self {
+        Self::size = 100;
         Decoder::new().decode_string(buf)
     }
 }
@@ -28,47 +89,6 @@ macro_rules! impl_decodable_number {
 impl_decodable_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
 
 
-/*
-macro_rules! impl_decodable_iterable {
-    ($($type:ident)*) => {
-        $(
-            impl<ContentT> FromBencode for $type<ContentT> where ContentT: FromBencode {
-
-                fn from_bencode(b: &Vec<u8>) -> Self {
-                    $type<ContentT>
-                    /.*
-                    let mut off = 0;
-
-                    // Ensure the buffer starts with 'l'
-                    if b.get(0) != Some(&b'l') {
-                        panic!("Invalid Bencode list");
-                    }
-
-                    off += 1; // Move past the 'l'
-
-                    let mut decoded_list = $type::new(); // Create the collection
-
-                    // Continue until we find the list terminator 'e'
-                    while let Some(&next) = b.get(off) {
-                        if next == b'e' {
-                            return decoded_list; // End of list, return the decoded collection
-                        }
-
-                        let item = ContentT::from_bencode(&b[off..].to_vec()); // Decode the item
-                        decoded_list.push(item); // Add the item to the collection
-                        off += item.to_bencode().len(); // Move past the decoded item
-                    }
-
-                    panic!("Invalid Bencode list"); // If we reach here, the list is malformed
-                    *./
-                }
-            }
-        )*
-    };
-}
-
-impl_decodable_iterable!(Vec VecDeque LinkedList);
-*/
 
 macro_rules! impl_decodable_iterable {
     ($($type:ident)*) => {
@@ -84,13 +104,14 @@ macro_rules! impl_decodable_iterable {
                     println!("ContentT: {}", stringify!(ContentT));
 
                     let mut decoder = Decoder::new();
+                    let response = $type::new()
 
                     for i in 1..buf.len() {
                     //for (index, &byte) in buf.iter().enumerate() {
                         println!("{}", buf[i] as char);
                     }
 
-                    $type::new()
+                    response
                 }
             }
         )*
@@ -98,4 +119,4 @@ macro_rules! impl_decodable_iterable {
 }
 
 impl_decodable_iterable!(Vec VecDeque LinkedList);
-
+*/
