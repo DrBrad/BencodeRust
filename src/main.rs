@@ -52,22 +52,23 @@ fn main() {
     //DICTIONARY TEST
 
     let mut dic = HashMap::new();
-    dic.insert("hello", "123123");
-    dic.insert("bloop", "poop");
+    dic.insert("hello", Poopie::STRING("123123".to_string()));
+    dic.insert("bloop", Poopie::STRING("poop".to_string()));
+    dic.insert("ben", Poopie::NUMBER(765));
     let encoded = dic.to_bencode();
     println!("{:?}", encoded);
     let mut off = 0;
-    let decoded = HashMap::<String, String>::from_bencode(&encoded, &mut off);
+    let decoded = HashMap::<String, Poopie>::from_bencode(&encoded, &mut off);
 
     for (key, value) in decoded.iter() {
-        println!("{}: {}", key, value);
+        println!("{}: {:?}", key, value);
     }
 
     //let stringify = std::str::from_utf8(&encoded).unwrap();
     //println!("{}", stringify);
 
 
-
+    /*
     //LIST TEST
 
     let mut vec = Vec::new();
@@ -87,6 +88,7 @@ fn main() {
     for item in &decoded {
         println!("{:?}", item);
     }
+    */
 }
 
 #[derive(Debug)]
