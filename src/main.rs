@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-//use std::collections::{BTreeMap, HashMap};
 use crate::variables::to_bencode::ToBencode;
 use crate::variables::from_bencode::FromBencode;
 
