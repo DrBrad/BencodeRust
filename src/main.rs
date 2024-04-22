@@ -19,6 +19,7 @@ fn main() {
     let mut off = 0;
     let decoded = f32::from_bencode(&encoded, &mut off);
     println!("{}", decoded);
+    println!("{}", off);
 
 
     /*
