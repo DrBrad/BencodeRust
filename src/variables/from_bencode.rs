@@ -17,20 +17,24 @@ pub enum BencodeVariable<'obj, 'ser: 'obj> {
 */
 pub trait FromBencode {
 
+    const TYPE: BencodeType;
+
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self;
 }
 
 impl FromBencode for String {
 
+    const TYPE: BencodeType = BencodeType::BYTES;
+
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
-        if BencodeType::type_by_prefix(buf[*off] as char) != BencodeType::BYTES {
+        if BencodeType::type_by_prefix(buf[*off] as char) != <String as FromBencode>::TYPE {
             panic!("Buffer is not a bencode bytes / string.");
         }
 
         let mut len_bytes = [0; 8];
         let start = *off;
 
-        while buf[*off] != b':' {
+        while buf[*off] != <String as FromBencode>::TYPE.delimiter() as u8 {
             len_bytes[*off - start] = buf[*off];
             *off += 1;
         }
@@ -51,8 +55,10 @@ macro_rules! impl_decodable_number {
         $(
             impl FromBencode for $type {
 
+                const TYPE: BencodeType = BencodeType::NUMBER;
+
                 fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
-                    if BencodeType::type_by_prefix(buf[*off] as char) != BencodeType::NUMBER {
+                    if BencodeType::type_by_prefix(buf[*off] as char) != <$type as FromBencode>::TYPE {
                         panic!("Buffer is not a bencode bytes / string.");
                     }
 
@@ -61,8 +67,7 @@ macro_rules! impl_decodable_number {
                     let mut c = [0 as char; 32];
                     let s = *off;
 
-                    //type.get_suffix()
-                    while buf[*off] != b'e' {
+                    while buf[*off] != <$type as FromBencode>::TYPE.suffix() as u8 {
                         c[*off - s] = buf[*off] as char;
                         *off += 1;
                     }
@@ -93,8 +98,10 @@ macro_rules! impl_decodable_iterable {
         $(
             impl<T> FromBencode for $type<T> where T: FromBencode {
 
+                const TYPE: BencodeType = BencodeType::ARRAY;
+
                 fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
-                    if BencodeType::type_by_prefix(buf[*off] as char) != BencodeType::ARRAY {
+                    if BencodeType::type_by_prefix(buf[*off] as char) != <$type<T> as FromBencode>::TYPE {
                         panic!("Buffer is not a bencode array.");
                     }
 
@@ -106,7 +113,7 @@ macro_rules! impl_decodable_iterable {
                     //println!("{:?}", type_);
                     //println!("{}", buf[*off] as char);
 
-                    while buf[*off] != b'e' {
+                    while buf[*off] != <$type<T> as FromBencode>::TYPE.suffix() as u8 {
                     //for off in 1..buf.len()-1 {
 
 
@@ -135,8 +142,10 @@ impl_decodable_iterable!(Vec);// VecDeque LinkedList);
 
 impl<K, V, S> FromBencode for HashMap<K, V, S> where K: FromBencode + Eq + Hash, V: FromBencode, S: BuildHasher + Default {
 
+    const TYPE: BencodeType = BencodeType::OBJECT;
+
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
-        if BencodeType::type_by_prefix(buf[*off] as char) != BencodeType::OBJECT {
+        if BencodeType::type_by_prefix(buf[*off] as char) != <HashMap<K, V, S> as FromBencode>::TYPE {
             panic!("Buffer is not a bencode array.");
         }
 
@@ -144,7 +153,7 @@ impl<K, V, S> FromBencode for HashMap<K, V, S> where K: FromBencode + Eq + Hash,
 
         let mut res = HashMap::<K, V, S>::with_hasher(Default::default());
 
-        while buf[*off] != b'e' {
+        while buf[*off] != <HashMap<K, V, S> as FromBencode>::TYPE.suffix() as u8 {
             //for off in 1..buf.len()-1 {
 
             let key = K::from_bencode(buf, off);

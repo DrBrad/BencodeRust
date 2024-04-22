@@ -61,4 +61,8 @@ fn main() {
     for (key, value) in decoded.iter() {
         println!("Key: {}, Value: {}", key, value);
     }
+
+    let sparkle_heart = std::str::from_utf8(&encoded).unwrap();
+
+    println!("{}", sparkle_heart);
 }
