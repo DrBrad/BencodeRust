@@ -11,14 +11,16 @@ mod tests {
     use std::collections::HashMap;
     use crate::variables::to_bencode::ToBencode;
     use crate::variables::from_bencode::FromBencode;
+    use crate::variables::inter::bencode_variable::BencodeBytes;
 
     #[test]
     fn main() {
         let original = "blank test".as_bytes();
         let encoded = original.to_bencode();
-        let decoded = String::from_bencode(&encoded, &mut 0);
+        let decoded = BencodeBytes::from_bencode(&encoded, &mut 0);
 
-        //println!("{}", decoded);
+        println!("{:?}", decoded.0);
+        println!("{}", decoded.as_string());
     }
 
     #[test]

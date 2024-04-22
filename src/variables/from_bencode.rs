@@ -1,6 +1,7 @@
 use std::collections::{BTreeMap, HashMap, LinkedList, VecDeque};
 use std::hash::{BuildHasher, Hash};
 use std::str::from_utf8;
+use std::borrow::Cow;
 use std::cmp::Ord;
 use crate::variables::inter::bencode_type::BencodeType;
 
@@ -10,51 +11,6 @@ pub trait FromBencode {
 
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self;
 }
-/*
-impl FromBencode for [u8] {
-
-    const TYPE: BencodeType = BencodeType::BYTES;
-
-    fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
-        // Check if the type matches the expected type
-        if BencodeType::type_by_prefix(buf[*off] as char) != Self::TYPE {
-            panic!("Buffer does not contain bytes.");
-        }
-
-        // Move the offset to skip the type prefix
-        *off += 1;
-
-        // Find the length of the byte slice
-        let mut len_bytes = [0; 8];
-        let start = *off;
-        while buf[*off] != Self::TYPE.delimiter() as u8 {
-            len_bytes[*off - start] = buf[*off];
-            *off += 1;
-        }
-
-        // Parse the length from the byte array
-        let length = len_bytes
-            .iter()
-            .take(*off - start)
-            .fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
-
-        // Ensure that the buffer has enough bytes remaining
-        if *off + length > buf.len() {
-            panic!("Buffer does not contain enough bytes.");
-        }
-
-        // Create a fixed-size array and copy the byte slice into it
-        let mut bytes = [0; 256];
-        bytes[..length].copy_from_slice(&buf[*off..*off + length]);
-
-        // Move the offset to skip the byte slice
-        *off += length;
-
-        // Return the copied byte slice
-        *bytes
-    }
-}
-*/
 
 impl FromBencode for String {
 
@@ -69,18 +25,16 @@ impl FromBencode for String {
         let start = *off;
 
         while buf[*off] != <String as FromBencode>::TYPE.delimiter() as u8 {
-            //TYPES NEED TO BE DEFINED HERE...
             len_bytes[*off - start] = buf[*off];
             *off += 1;
         }
 
         let length = len_bytes.iter().take(*off - start).fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
-
-        let string_bytes = &buf[*off + 1..*off + 1 + length];
+        let bytes = &buf[*off + 1..*off + 1 + length];
 
         *off += 1+length;
 
-        String::from_utf8_lossy(string_bytes).into_owned()
+        String::from_utf8_lossy(bytes).into_owned()
     }
 }
 
@@ -106,10 +60,10 @@ macro_rules! impl_decodable_number {
                         *off += 1;
                     }
 
-                    let number_str = from_utf8(&buf[s..*off]).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
+                    let str = from_utf8(&buf[s..*off]).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
 
                     *off += 1;
-                    number_str.parse::<$type>().unwrap_or_else(|_| panic!("Failed to parse to Number"))
+                    str.parse::<$type>().unwrap_or_else(|_| panic!("Failed to parse to Number"))
                 }
             }
         )*

@@ -133,36 +133,3 @@ impl<K, V, S> ToBencode for HashMap<K, V, S> where K: ToBencode, V: ToBencode, S
         buf
     }
 }
-
-
-
-/*
-pub enum Value<T> {
-    STRING(String),
-    NUMBER(T)
-}
-
-impl<T: Display> ToBencode for Value<T> {
-
-    fn to_bencode(&self) -> Vec<u8> {
-        match self {
-            Value::STRING(v) => encode_string(v),
-            Value::NUMBER(v) => encode_number(v)
-        }
-    }
-}
-
-
-
-
-impl <E: ToBencode> ToBencode for Box<E> {
-//impl<'a, ContentT> ToBencode for &'a [ContentT] where ContentT: ToBencode {
-
-    fn to_bencode(&self) -> Vec<u8> {
-        Vec::new()
-    }
-}
-*/
-
-
-
