@@ -9,9 +9,17 @@ ADD FUNCTIONALITY FOR BYTES [u8] or Vec<u8> for byte to_bencode and from_bencode
 mod tests {
 
     use std::collections::HashMap;
-    use std::borrow::Borrow;
     use crate::variables::to_bencode::ToBencode;
     use crate::variables::from_bencode::FromBencode;
+
+    #[test]
+    fn main() {
+        let original = "blank test".as_bytes();
+        let encoded = original.to_bencode();
+        let decoded = String::from_bencode(&encoded, &mut 0);
+
+        //println!("{}", decoded);
+    }
 
     #[test]
     fn number() {
@@ -55,16 +63,16 @@ mod tests {
     #[test]
     fn object() {
         let mut dic = HashMap::new();
-        dic.insert("hello", "123123");
-        dic.insert("bloop", "another test");
+        dic.insert("hello".to_string(), "123123".to_string());
+        dic.insert("bloop".to_string(), "another test".to_string());
         let encoded = dic.to_bencode();
         let decoded = HashMap::<String, String>::from_bencode(&encoded, &mut 0);
 
         assert_eq!(dic.len(), decoded.len());
 
         for key in decoded.keys() {
-            if dic.contains_key(key.as_str()) {
-                assert_eq!(dic.get(key.as_str()), decoded.get(key.as_str()));
+            if dic.contains_key(key) {
+                assert_eq!(dic.get(key).unwrap(), decoded.get(key).unwrap());
             } else {
                 panic!("Key '{}' does not exist in both maps", key);
             }

@@ -1,5 +1,4 @@
 use std::collections::{BTreeMap, HashMap, LinkedList, VecDeque};
-//use std::fmt::Display;
 use std::hash::BuildHasher;
 use crate::variables::inter::bencode_type::BencodeType;
 
@@ -35,6 +34,20 @@ impl ToBencode for &str {
         r.extend_from_slice(z.len().to_string().as_bytes());
         r.push(Self::TYPE.delimiter() as u8);
         r.extend_from_slice(z);
+        r
+    }
+}
+
+impl ToBencode for &[u8] {
+
+    const TYPE: BencodeType = BencodeType::BYTES;
+
+    fn to_bencode(&self) -> Vec<u8> {
+        let mut r: Vec<u8> = Vec::new();
+
+        r.extend_from_slice(self.len().to_string().as_bytes());
+        r.push(Self::TYPE.delimiter() as u8);
+        r.extend_from_slice(self);
         r
     }
 }

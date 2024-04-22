@@ -10,6 +10,51 @@ pub trait FromBencode {
 
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self;
 }
+/*
+impl FromBencode for [u8] {
+
+    const TYPE: BencodeType = BencodeType::BYTES;
+
+    fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
+        // Check if the type matches the expected type
+        if BencodeType::type_by_prefix(buf[*off] as char) != Self::TYPE {
+            panic!("Buffer does not contain bytes.");
+        }
+
+        // Move the offset to skip the type prefix
+        *off += 1;
+
+        // Find the length of the byte slice
+        let mut len_bytes = [0; 8];
+        let start = *off;
+        while buf[*off] != Self::TYPE.delimiter() as u8 {
+            len_bytes[*off - start] = buf[*off];
+            *off += 1;
+        }
+
+        // Parse the length from the byte array
+        let length = len_bytes
+            .iter()
+            .take(*off - start)
+            .fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
+
+        // Ensure that the buffer has enough bytes remaining
+        if *off + length > buf.len() {
+            panic!("Buffer does not contain enough bytes.");
+        }
+
+        // Create a fixed-size array and copy the byte slice into it
+        let mut bytes = [0; 256];
+        bytes[..length].copy_from_slice(&buf[*off..*off + length]);
+
+        // Move the offset to skip the byte slice
+        *off += length;
+
+        // Return the copied byte slice
+        *bytes
+    }
+}
+*/
 
 impl FromBencode for String {
 
@@ -64,12 +109,7 @@ macro_rules! impl_decodable_number {
                     let number_str = from_utf8(&buf[s..*off]).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
 
                     *off += 1;
-                    let num = match number_str.parse::<$type>() {
-                        Ok(number) => number,
-                        Err(_) => panic!("Number is invalid."),
-                    };
-
-                    num
+                    number_str.parse::<$type>().unwrap_or_else(|_| panic!("Failed to parse to Number"))
                 }
             }
         )*
