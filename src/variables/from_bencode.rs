@@ -5,6 +5,89 @@ use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
 
+
+/*
+pub enum BencodeVariable<'obj, 'ser: 'obj> {
+    NUMBER(&'ser [u8]),
+    //ARRAY(ListDecoder<'obj, 'ser>),
+    //OBJECT(DictDecoder<'obj, 'ser>),
+    BYTES(&'ser [u8])
+}
+*/
+pub trait FromBencode {
+
+    fn from_bencode(b: &Vec<u8>, off: &mut usize) -> Self;
+}
+
+impl FromBencode for String {
+
+    fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
+        let mut len_bytes = [0; 8];
+        let start = *off;
+
+        while buf[*off] != b':' {
+            len_bytes[*off - start] = buf[*off];
+            *off += 1;
+        }
+
+        let length = len_bytes.iter().take(*off - start).fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
+
+        let string_bytes = &buf[*off + 1..*off + 1 + length];
+
+        *off += 1+length;
+
+        String::from_utf8_lossy(string_bytes).into_owned()
+    }
+}
+
+
+macro_rules! impl_decodable_number {
+    ($($type:ty)*) => {
+        $(
+            impl FromBencode for $type {
+
+                fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
+                    if buf[0] != b'i' {
+                        panic!("Buffer is not a bencode array.");
+                    }
+
+                    *off += 1;
+
+                    let mut c = [0 as char; 32];
+                    let s = *off;
+
+                    //type.get_suffix()
+                    while buf[*off] != b'e' {
+                        c[*off - s] = buf[*off] as char;
+                        *off += 1;
+                    }
+
+                    let number_str = from_utf8(&buf[s..*off]).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
+
+                    *off += 1;
+                    let num = match number_str.parse::<$type>() {
+                        Ok(number) => number,
+                        Err(_) => panic!("Number is invalid."),
+                    };
+
+                    num
+                }
+            }
+        )*
+    }
+}
+
+impl_decodable_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
+
+
+
+
+
+
+
+//ATTEMPT 2
+
+/*
 pub struct BencodeBytes {
     pub(crate) size: usize,
     pub(crate) buf: Vec<u8>
@@ -208,6 +291,7 @@ macro_rules! impl_decodable_iterable {
 }
 
 impl_decodable_iterable!(Vec);// VecDeque LinkedList);
+*/
 
 
 
@@ -215,8 +299,7 @@ impl_decodable_iterable!(Vec);// VecDeque LinkedList);
 
 
 
-
-
+//ATTEMPT 1
 
 /*
 pub trait FromBencode {
