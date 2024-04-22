@@ -1,3 +1,18 @@
+pub mod variables;
+pub mod utils;
+
+#[cfg(test)]
+mod tests {
+
+    #[test]
+    fn it_works() {
+        //let result = add(2, 2);
+        //assert_eq!(result, 4);
+        println!("Hello World");
+    }
+}
+
+/*
 use std::collections::HashMap;
 use crate::variables::to_bencode::ToBencode;
 use crate::variables::from_bencode::FromBencode;
@@ -68,7 +83,7 @@ fn main() {
     //println!("{}", stringify);
 
 
-    /*
+
     //LIST TEST
 
     let mut vec = Vec::new();
@@ -88,7 +103,6 @@ fn main() {
     for item in &decoded {
         println!("{:?}", item);
     }
-    */
 }
 
 #[derive(Debug)]
@@ -125,3 +139,4 @@ impl FromBencode for Poopie {
         }
     }
 }
+*/

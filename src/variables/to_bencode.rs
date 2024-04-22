@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, HashMap, LinkedList, VecDeque};
-use std::fmt::Display;
-use std::hash::{BuildHasher, Hash};
+//use std::fmt::Display;
+use std::hash::BuildHasher;
 use crate::variables::inter::bencode_type::BencodeType;
 
 pub trait ToBencode {
