@@ -1,20 +1,9 @@
 use std::collections::{HashMap, LinkedList, VecDeque};
 use std::hash::{BuildHasher, Hash};
-//use crate::variables::decoder::{Decoder};
 use std::str::from_utf8;
 use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
-
-
-/*
-pub enum BencodeVariable<'obj, 'ser: 'obj> {
-    NUMBER(&'ser [u8]),
-    //ARRAY(ListDecoder<'obj, 'ser>),
-    //OBJECT(DictDecoder<'obj, 'ser>),
-    BYTES(&'ser [u8])
-}
-*/
 pub trait FromBencode {
 
     const TYPE: BencodeType;
