@@ -7,6 +7,7 @@ mod variables;
 
 
 fn main() {
+
     let test = "blank test";
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
@@ -15,7 +16,7 @@ fn main() {
     //let bytes: &[u8] = b"hello";
     let decoded = String::from_bencode(&encoded);
     println!("{}", decoded);
-    println!("{}", encoded.len());
+    //println!("{}", encoded.len());
 
 
 
@@ -29,7 +30,7 @@ fn main() {
 
     let decoded = f32::from_bencode(&encoded);
     println!("{}", decoded);
-    println!("{}", encoded.len());
+    //println!("{}", encoded.len());
 
 
     /*

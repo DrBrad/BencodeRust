@@ -9,12 +9,8 @@ pub trait FromBencode {
 
 impl FromBencode for String {
 
-    fn from_bencode(b: &Vec<u8>) -> Self {
-        let mut dec = Decoder::new();
-        let s = dec.decode_string(b);
-        println!("{}", dec.off);
-        s
-        //decode_string(b, 0).to_string()
+    fn from_bencode(buf: &Vec<u8>) -> Self {
+        Decoder::new().decode_string(buf)
     }
 }
 
@@ -22,14 +18,8 @@ macro_rules! impl_decodable_number {
     ($($type:ty)*) => {$(
         impl FromBencode for $type {
 
-            fn from_bencode(b: &Vec<u8>) -> Self {
-
-                let mut dec = Decoder::new();
-                let s = dec.decode_number(b);
-                println!("{}", dec.off);
-                s
-                //0 as $type
-                //decode_number::<$type>(b, 0)
+            fn from_bencode(buf: &Vec<u8>) -> Self {
+                Decoder::new().decode_number(buf)
             }
         }
     )*}
@@ -37,13 +27,16 @@ macro_rules! impl_decodable_number {
 
 impl_decodable_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
 
+
 /*
 macro_rules! impl_decodable_iterable {
     ($($type:ident)*) => {
         $(
-            impl<ContentT> FromBencode for $type<ContentT> where ContentT: FromBencode + ToBencode {
+            impl<ContentT> FromBencode for $type<ContentT> where ContentT: FromBencode {
 
                 fn from_bencode(b: &Vec<u8>) -> Self {
+                    $type<ContentT>
+                    /.*
                     let mut off = 0;
 
                     // Ensure the buffer starts with 'l'
@@ -67,6 +60,7 @@ macro_rules! impl_decodable_iterable {
                     }
 
                     panic!("Invalid Bencode list"); // If we reach here, the list is malformed
+                    *./
                 }
             }
         )*
@@ -75,4 +69,21 @@ macro_rules! impl_decodable_iterable {
 
 impl_decodable_iterable!(Vec VecDeque LinkedList);
 */
+
+macro_rules! impl_decodable_iterable {
+    ($($type:ident)*) => {
+        $(
+            impl<ContentT> FromBencode for $type<ContentT> where ContentT: FromBencode {
+
+                fn from_bencode(buf: &Vec<u8>) -> Self {
+
+
+                    $type::new()
+                }
+            }
+        )*
+    };
+}
+
+impl_decodable_iterable!(Vec VecDeque LinkedList);
 
