@@ -1,7 +1,6 @@
 use std::collections::{BTreeMap, HashMap, LinkedList, VecDeque};
 use std::hash::{BuildHasher, Hash};
 use std::str::from_utf8;
-use std::borrow::Cow;
 use std::cmp::Ord;
 use crate::variables::inter::bencode_type::BencodeType;
 

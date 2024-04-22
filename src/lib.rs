@@ -1,9 +1,4 @@
 pub mod variables;
-pub mod utils;
-
-/*
-ADD FUNCTIONALITY FOR BYTES [u8] or Vec<u8> for byte to_bencode and from_bencode...
-*/
 
 #[cfg(test)]
 mod tests {
@@ -11,16 +6,17 @@ mod tests {
     use std::collections::HashMap;
     use crate::variables::to_bencode::ToBencode;
     use crate::variables::from_bencode::FromBencode;
-    use crate::variables::bencode_bytes::BencodeBytes;
+    use crate::variables::bencode_byte_wrapper::ByteWrapper;
 
     #[test]
     fn main() {
-        let original = "blank test".as_bytes();
+        let original = ByteWrapper("blank test".as_bytes().to_vec());
         let encoded = original.to_bencode();
-        let decoded = BencodeBytes::from_bencode(&encoded, &mut 0);
+        let decoded = ByteWrapper::from_bencode(&encoded, &mut 0);
 
-        println!("{:?}", decoded.0);
-        println!("{}", decoded.as_string());
+        assert_eq!(original, decoded);
+
+        println!("Bencode Bytes Encoding & Decoding 100%");
     }
 
     #[test]
@@ -42,7 +38,7 @@ mod tests {
 
         assert_eq!(original, decoded);
 
-        println!("Bencode Bytes / String Encoding & Decoding 100%");
+        println!("Bencode String Encoding & Decoding 100%");
     }
 
     #[test]
