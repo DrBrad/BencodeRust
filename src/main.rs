@@ -11,26 +11,32 @@ fn main() {
     let test = "blank test";
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
-    //println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
-
-    //let bytes: &[u8] = b"hello";
     let decoded = String::from_bencode(&encoded);
     println!("{}", decoded);
-    //println!("{}", encoded.len());
 
 
 
     let test = 100.56;
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
-    //println!("{}", String::from_utf8(encoded).expect("Invalid UTF-8"));
-
-    //let decoded = f32::from_bencode(&encoded);
-    //println!("{}", decoded);
-
     let decoded = f32::from_bencode(&encoded);
     println!("{}", decoded);
-    //println!("{}", encoded.len());
+
+
+
+
+    let mut v = Vec::new();
+    v.push("hello world");
+    v.push("new one");
+
+    let encoded = v.to_bencode();
+    println!("{:?}", encoded);
+    let decoded = Vec::<String>::from_bencode(&encoded);
+
+    for item in decoded {
+        println!("{}", item);
+    }
+
 
 
     /*

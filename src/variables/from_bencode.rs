@@ -76,7 +76,19 @@ macro_rules! impl_decodable_iterable {
             impl<ContentT> FromBencode for $type<ContentT> where ContentT: FromBencode {
 
                 fn from_bencode(buf: &Vec<u8>) -> Self {
+                    if buf[0] != b'l' {
+                        panic!("Buffer is not a bencode array.");
+                    }
 
+                    println!("{}", stringify!($type));
+                    println!("ContentT: {}", stringify!(ContentT));
+
+                    let mut decoder = Decoder::new();
+
+                    for i in 1..buf.len() {
+                    //for (index, &byte) in buf.iter().enumerate() {
+                        println!("{}", buf[i] as char);
+                    }
 
                     $type::new()
                 }
