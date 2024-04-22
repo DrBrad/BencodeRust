@@ -83,6 +83,46 @@ impl_decodable_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f
 
 
 
+macro_rules! impl_decodable_iterable {
+    ($($type:ident)*) => {
+        $(
+            impl FromBencode for $type<String> {
+            //impl<ContentT> FromBencode for $type<ContentT> where ContentT: FromBencode {
+
+                fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
+                    if buf[*off] != b'l' {
+                        panic!("Buffer is not a bencode array.");
+                    }
+
+                    *off += 1;
+
+                    let mut res = $type::new();
+
+                    let type_ = BencodeType::type_by_prefix(buf[*off] as char);
+                    //println!("{}", type_);
+                    println!("{:?}", type_);
+                    //println!("{}", buf[*off] as char);
+
+                    while buf[*off] != b'e' {
+                    //for off in 1..buf.len()-1 {
+
+
+                        //MOVE BELOW INTO A DIFFERENT FUNCTION...
+
+                        //res.push(x);
+                        //off += 1;
+                        break;
+                    }
+
+
+                    res
+                }
+            }
+        )*
+    };
+}
+
+impl_decodable_iterable!(Vec);// VecDeque LinkedList);
 
 
 //ATTEMPT 2

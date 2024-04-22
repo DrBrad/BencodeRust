@@ -22,6 +22,18 @@ fn main() {
     println!("{}", off);
 
 
+    let mut vec = Vec::new();
+    vec.push("asdasd");
+    vec.push("bloop");
+    let encoded = vec.to_bencode();
+    println!("{:?}", encoded);
+    let mut off = 0;
+    let decoded = Vec::from_bencode(&encoded, &mut off);
+    //println!("{}", decoded.get(0));
+    println!("{}", off);
+
+
+
     /*
     let test = "blank test";
     let encoded = test.to_bencode();
