@@ -22,6 +22,10 @@ pub trait FromBencode {
 impl FromBencode for String {
 
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
+        if BencodeType::type_by_prefix(buf[*off] as char) != BencodeType::BYTES {
+            panic!("Buffer is not a bencode bytes / string.");
+        }
+
         let mut len_bytes = [0; 8];
         let start = *off;
 
@@ -47,8 +51,8 @@ macro_rules! impl_decodable_number {
             impl FromBencode for $type {
 
                 fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
-                    if buf[0] != b'i' {
-                        panic!("Buffer is not a bencode array.");
+                    if BencodeType::type_by_prefix(buf[*off] as char) != BencodeType::NUMBER {
+                        panic!("Buffer is not a bencode bytes / string.");
                     }
 
                     *off += 1;
@@ -89,7 +93,7 @@ macro_rules! impl_decodable_iterable {
             impl<T> FromBencode for $type<T> where T: FromBencode {
 
                 fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
-                    if buf[*off] != b'l' {
+                    if BencodeType::type_by_prefix(buf[*off] as char) != BencodeType::ARRAY {
                         panic!("Buffer is not a bencode array.");
                     }
 
