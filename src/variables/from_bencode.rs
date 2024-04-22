@@ -1,5 +1,7 @@
 use std::collections::{LinkedList, VecDeque};
 //use crate::variables::decoder::{Decoder};
+use std::str::from_utf8;
+use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
 
@@ -25,14 +27,14 @@ impl BencodeBytes {
 
 
 
-pub struct BencodeNumber<T> {
+pub struct BencodeNumber {
     pub(crate) size: usize,
-    pub(crate) num: T
+    pub(crate) num: Vec<u8>
 }
 
 
 
-impl<T> BencodeNumber<T> {
+impl BencodeNumber {
 
     /*
     pub fn new() -> Self {
@@ -48,15 +50,14 @@ impl<T> BencodeNumber<T> {
 
 pub trait FromBencode {
 
-    fn from_bencode(b: &Vec<u8>) -> Self;
+    fn from_bencode(b: &Vec<u8>, off: usize) -> Self;
 }
 
 impl FromBencode for BencodeBytes {
 
-    fn from_bencode(buf: &Vec<u8>) -> Self {
+    fn from_bencode(buf: &Vec<u8>, mut off: usize) -> Self {
         let mut len_bytes = [0; 8];
-        let start = 0;
-        let mut off = 0;
+        let start = off;
 
         while buf[off] != b':' {
             len_bytes[off - start] = buf[off];
@@ -64,72 +65,149 @@ impl FromBencode for BencodeBytes {
         }
 
         let length = len_bytes.iter().take(off - start).fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
+
         let string_bytes = &buf[off + 1..off + 1 + length];
 
         off += 1+length;
 
         Self {
-            size: off,
+            size: off-start,
             buf: string_bytes.to_vec()
         }
     }
 }
 
-macro_rules! impl_decodable_number {
-    ($($type:ty)*) => {$(
-        /*
-        impl FromBencode for $type {
 
-            fn from_bencode(buf: &Vec<u8>) -> Self {
-                Decoder::new().decode_number(buf)
-            }
+impl FromBencode for BencodeNumber {//<$type> {
+
+    fn from_bencode(buf: &Vec<u8>, mut off: usize) -> Self {
+        //VERIFY OFF
+        if buf[off] != b'i' {
+            panic!("Buffer is not a bencode array.");
         }
+
+        off += 1;
+
+        let mut c = [0 as char; 32];
+        let s = off;
+
+        //type.get_suffix()
+        while buf[off] != b'e' {
+            c[off - s] = buf[off] as char;
+            off += 1;
+        }
+
+        let number_str = from_utf8(&buf[s..off]).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
+        /*
+        let num = match number_str.parse::<$type>() {
+            Ok(number) => number,
+            Err(_) => panic!("Number is invalid."),
+        };
         */
 
+        Self {
+            size: off-s+2,
+            num: buf[s..off].to_vec()
+        }
+    }
+}
 
 
-        impl FromBencode for BencodeNumber<$type> {
+/*
+macro_rules! impl_decodable_number {
+    ($($type:ty)*) => {
+        $(
+            impl FromBencode for BencodeNumber {//<$type> {
 
-            fn from_bencode(buf: &Vec<u8>) -> Self {
-                let mut c = [0 as char; 32];
-                let mut off = 1;
-                let s = off;
+                fn from_bencode(buf: &Vec<u8>, mut off: usize) -> Self {
+                    //VERIFY OFF
+                    if buf[0] != b'i' {
+                        panic!("Buffer is not a bencode array.");
+                    }
 
-                //type.get_suffix()
-                while buf[off] != b'e' {
-                    c[off - s] = buf[off] as char;
                     off += 1;
-                }
 
-                let number_str = std::str::from_utf8(&buf[s..off]).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
+                    let mut c = [0 as char; 32];
+                    let s = off;
 
+                    //type.get_suffix()
+                    while buf[off] != b'e' {
+                        c[off - s] = buf[off] as char;
+                        off += 1;
+                    }
 
-                let num = match number_str.parse::<$type>() {
-                    Ok(number) => number,
-                    Err(_) => panic!("Number is invalid."),
-                };
+                    let number_str = from_utf8(&buf[s..off]).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
 
-                off += 1;
+                    /*
+                    let num = match number_str.parse::<$type>() {
+                        Ok(number) => number,
+                        Err(_) => panic!("Number is invalid."),
+                    };
+                    */
 
-                Self {
-                    size: off,
-                    num: num
+                    off += 1;
+
+                    Self {
+                        size: off-s,
+                        num: number_str
+                    }
                 }
             }
-        }
-
-
-
-
-
-
-
-    )*}
+        )*
+    }
 }
 
 impl_decodable_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
+*/
+
+macro_rules! impl_decodable_iterable {
+    ($($type:ident)*) => {
+        $(
+            impl FromBencode for $type<BencodeNumber> {
+            //impl<ContentT> FromBencode for $type<ContentT> where ContentT: FromBencode {
+
+                fn from_bencode(buf: &Vec<u8>, mut off: usize) -> Self {
+                    if buf[off] != b'l' {
+                        panic!("Buffer is not a bencode array.");
+                    }
+
+                    off += 1;
+
+                    let mut res = $type::new();
+
+                    while buf[off] != b'e' {
+                    //for off in 1..buf.len()-1 {
+
+                        //MOVE BELOW INTO A DIFFERENT FUNCTION...
+
+                        let type_ = BencodeType::type_by_prefix(buf[off] as char);
+
+                        let x = match type_ {
+                            BencodeType::NUMBER => BencodeNumber::from_bencode(buf, off),
+                            //BencodeType::ARRAY =>
+                            //BencodeType::OBJECT =>
+                            //BencodeType::BYTES => BencodeBytes::from_bencode(buf, off),
+                            _ => unimplemented!()
+                        };
+                        //let x = BencodeBytes::from_bencode(buf, off);
+
+                        off += x.size;
+                        res.push(x);
+                        //off += 1;
 
 
+
+                    }
+
+
+                    res
+                }
+            }
+        )*
+    };
+}
+
+impl_decodable_iterable!(Vec);// VecDeque LinkedList);
 
 
 

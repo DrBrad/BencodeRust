@@ -8,40 +8,44 @@ mod variables;
 
 fn main() {
 
+    /*
     let test = "blank test";
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
-    let decoded = BencodeBytes::from_bencode(&encoded);
+    let decoded = BencodeBytes::from_bencode(&encoded, 0);
     println!("{}", decoded.as_string());
-    println!("{}", decoded.size);
-    println!("{}", encoded.len());
+    //println!("{}", decoded.size);
+    //println!("{}", encoded.len());
 
 
 
     let test = 100.56;
     let encoded = test.to_bencode();
     println!("{:?}", encoded);
-    let decoded = BencodeNumber::<f32>::from_bencode(&encoded);
+    let decoded = BencodeNumber::<f32>::from_bencode(&encoded, 0);
     println!("{}", decoded.num);
-    println!("{}", decoded.size);
-    println!("{}", encoded.len());
+    //println!("{}", decoded.size);
+    //println!("{}", encoded.len());
+    */
 
 
 
-    /*
 
     let mut v = Vec::new();
-    v.push("hello world");
-    v.push("new one");
+    v.push(100);
+    v.push(500);
+    //v.push("hello world");
+    //v.push("new one");
 
     let encoded = v.to_bencode();
     println!("{:?}", encoded);
-    let decoded = Vec::<String>::from_bencode(&encoded);
+    println!("{}", encoded.len());
+    let decoded = Vec::<BencodeNumber>::from_bencode(&encoded, 0);
+    println!("{}", decoded.len());
 
     for item in decoded {
-        println!("{}", item);
+        println!("{:?}", item.num);
     }
-    */
 
 
 
