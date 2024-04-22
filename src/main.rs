@@ -80,15 +80,16 @@ fn main() {
     //println!("{}", string);
 
     let mut off = 0;
-    let decoded = Vec::<String>::from_bencode(&encoded, &mut off);
+    let decoded = Vec::<Poopie>::from_bencode(&encoded, &mut off);
     //println!("{}", decoded.get(0));
     //println!("{}", off);
 
-    for item in decoded {
-        println!("{}", item);
+    for item in &decoded {
+        println!("{:?}", item);
     }
 }
 
+#[derive(Debug)]
 pub enum Poopie {
     NUMBER(i32),
     STRING(String)
