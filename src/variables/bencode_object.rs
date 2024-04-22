@@ -28,8 +28,6 @@ impl<V> FromBencode for BencodeObject<V> where V: FromBencode {
         let mut res = HashMap::<ByteWrapper, V>::with_hasher(Default::default());
 
         while buf[*off] != Self::TYPE.suffix() as u8 {
-            //for off in 1..buf.len()-1 {
-
             let key = ByteWrapper::from_bencode(buf, off);
 
             let type_ = BencodeType::type_by_prefix(buf[*off] as char);
@@ -49,7 +47,6 @@ impl<V> FromBencode for BencodeObject<V> where V: FromBencode {
 }
 
 impl<V> ToBencode for BencodeObject<V> where V: ToBencode {
-
 
     const TYPE: BencodeType = BencodeType::OBJECT;
 
