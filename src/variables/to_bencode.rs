@@ -64,15 +64,15 @@ macro_rules! impl_encodable_iterable {
                 const TYPE: BencodeType = BencodeType::ARRAY;
 
                 fn to_bencode(&self) -> Vec<u8> {
-                    let mut r: Vec<u8> = Vec::new();
-                    r.push(b'l');
+                    let mut buf: Vec<u8> = Vec::new();
+                    buf.push(Self::TYPE.prefix() as u8);
 
                     for item in self {
-                        r.extend_from_slice(&item.to_bencode());
+                        buf.extend_from_slice(&item.to_bencode());
                     }
 
-                    r.push(b'e');
-                    r
+                    buf.push(Self::TYPE.suffix() as u8);
+                    buf
                 }
             }
         )*
@@ -90,6 +90,7 @@ impl<K, V> ToBencode for BTreeMap<K, V> where K: ToBencode, V: ToBencode {
 
     fn to_bencode(&self) -> Vec<u8> {
         let mut buf: Vec<u8> = Vec::new();
+        buf.push(Self::TYPE.prefix() as u8);
         buf.push(b'd');
 
         for (key, value) in self {
@@ -97,7 +98,7 @@ impl<K, V> ToBencode for BTreeMap<K, V> where K: ToBencode, V: ToBencode {
             buf.extend_from_slice(&value.to_bencode());
         }
 
-        buf.push(b'e');
+        buf.push(Self::TYPE.suffix() as u8);
         buf
     }
 }

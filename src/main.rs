@@ -31,7 +31,6 @@ fn main() {
 
 
 
-    /*
     //LIST TEST
 
     let mut vec = Vec::new();
@@ -63,5 +62,4 @@ fn main() {
     for (key, value) in decoded.iter() {
         println!("Key: {}, Value: {}", key, value);
     }
-    */
 }
