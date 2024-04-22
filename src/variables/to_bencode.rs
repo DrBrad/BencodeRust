@@ -9,7 +9,7 @@ pub trait ToBencode {
 
     fn to_bencode(&self) -> Vec<u8>;
 }
-
+/*
 impl ToBencode for String {
 
     const TYPE: BencodeType = BencodeType::BYTES;
@@ -135,3 +135,4 @@ impl<K, V, S> ToBencode for HashMap<K, V, S> where K: ToBencode, V: ToBencode, S
         buf
     }
 }
+*/

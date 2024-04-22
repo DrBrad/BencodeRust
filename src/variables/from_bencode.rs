@@ -11,6 +11,7 @@ pub trait FromBencode {
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self;
 }
 
+/*
 impl FromBencode for String {
 
     const TYPE: BencodeType = BencodeType::BYTES;
@@ -206,3 +207,4 @@ impl<K, V, S> FromBencode for HashMap<K, V, S> where K: FromBencode + Eq + Hash,
         res
     }
 }
+*/

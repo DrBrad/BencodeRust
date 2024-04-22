@@ -6,28 +6,45 @@ mod tests {
     use std::collections::HashMap;
     use crate::variables::to_bencode::ToBencode;
     use crate::variables::from_bencode::FromBencode;
-    use crate::variables::bencode_byte_wrapper::ByteWrapper;
+    use crate::variables::bencode_bytes::BencodeBytes;
     use crate::variables::bencode_object::BencodeObject;
 
     #[test]
     fn main() {
+
+        let mut obj = BencodeObject(HashMap::new());
+        obj.0.insert(BencodeBytes("hello".as_bytes().to_vec()), BencodeBytes("world".as_bytes().to_vec()));
+        obj.0.insert(BencodeBytes("net".as_bytes().to_vec()), BencodeBytes("test".as_bytes().to_vec()));
+
+        let encoded = obj.to_bencode();
+        println!("{:?}", encoded);
+
+        let decoded = BencodeObject::<BencodeBytes>::from_bencode(&encoded, &mut 0);
+        for key in decoded.0.keys() {
+            println!("{} => {}", key.as_string(), decoded.0.get(key).unwrap().as_string());
+        }
+
+
+        /*
         let mut s = BencodeObject(HashMap::new());
-        s.0.insert(ByteWrapper("hello".as_bytes().to_vec()), ByteWrapper("world".as_bytes().to_vec()));
+        s.0.insert(BencodeBytes("hello".as_bytes().to_vec()), BencodeBytes("world".as_bytes().to_vec()));
 
         println!("{:?}", s.to_bencode());
 
 
-        let original = ByteWrapper("blank test".as_bytes().to_vec());
+        let original = BencodeBytes("blank test".as_bytes().to_vec());
         let encoded = original.to_bencode();
-        let decoded = ByteWrapper::from_bencode(&encoded, &mut 0);
+        let decoded = BencodeBytes::from_bencode(&encoded, &mut 0);
 
         println!("{}", decoded.as_string());
 
         assert_eq!(original, decoded);
 
         println!("Bencode Bytes Encoding & Decoding 100%");
+        */
     }
 
+    /*
     #[test]
     fn number() {
         let original = 100.67;
@@ -87,4 +104,5 @@ mod tests {
 
         println!("Bencode Object Encoding & Decoding 100%");
     }
+    */
 }

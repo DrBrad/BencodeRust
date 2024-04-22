@@ -3,28 +3,28 @@ use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
 #[derive(Debug, Eq, Hash, PartialEq)]
-pub struct ByteWrapper(pub Vec<u8>);
+pub struct BencodeBytes(pub Vec<u8>);
 
-impl ByteWrapper {
+impl BencodeBytes {
 
     pub fn as_string(&self) -> String {
         String::from_utf8(self.0.clone()).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"))
     }
 }
 
-impl FromBencode for ByteWrapper {
+impl FromBencode for BencodeBytes {
 
     const TYPE: BencodeType = BencodeType::BYTES;
 
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
-        if BencodeType::type_by_prefix(buf[*off] as char) != <ByteWrapper as FromBencode>::TYPE {
+        if BencodeType::type_by_prefix(buf[*off] as char) != <BencodeBytes as FromBencode>::TYPE {
             panic!("Buffer is not a bencode bytes / string.");
         }
 
         let mut len_bytes = [0; 8];
         let start = *off;
 
-        while buf[*off] != <ByteWrapper as FromBencode>::TYPE.delimiter() as u8 {
+        while buf[*off] != <BencodeBytes as FromBencode>::TYPE.delimiter() as u8 {
             len_bytes[*off - start] = buf[*off];
             *off += 1;
         }
@@ -34,11 +34,11 @@ impl FromBencode for ByteWrapper {
 
         *off += 1+length;
 
-        ByteWrapper(bytes)
+        BencodeBytes(bytes)
     }
 }
 
-impl ToBencode for ByteWrapper {
+impl ToBencode for BencodeBytes {
 
     const TYPE: BencodeType = BencodeType::BYTES;
 
@@ -46,7 +46,7 @@ impl ToBencode for ByteWrapper {
         let mut r: Vec<u8> = Vec::new();
 
         r.extend_from_slice(self.0.len().to_string().as_bytes());
-        r.push(<ByteWrapper as ToBencode>::TYPE.delimiter() as u8);
+        r.push(<BencodeBytes as ToBencode>::TYPE.delimiter() as u8);
         r.extend(self.0.clone());
         r
     }

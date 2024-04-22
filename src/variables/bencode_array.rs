@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::hash::Hash;
-use crate::variables::bencode_byte_wrapper::ByteWrapper;
+use crate::variables::bencode_bytes::BencodeBytes;
 use crate::variables::from_bencode::FromBencode;
 use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
