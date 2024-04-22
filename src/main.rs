@@ -15,7 +15,7 @@ fn main() {
     let mut off = 0;
     let decoded = String::from_bencode(&encoded, &mut off);
     println!("{}", decoded);
-    println!("{}", off);
+    //println!("{}", off);
 
 
 
@@ -26,7 +26,7 @@ fn main() {
     let mut off = 0;
     let decoded = f32::from_bencode(&encoded, &mut off);
     println!("{}", decoded);
-    println!("{}", off);
+    //println!("{}", off);
 
 
 
@@ -40,7 +40,7 @@ fn main() {
     let mut off = 0;
     let decoded = Vec::<String>::from_bencode(&encoded, &mut off);
     //println!("{}", decoded.get(0));
-    println!("{}", off);
+    //println!("{}", off);
 
     for item in decoded {
         println!("{}", item);
@@ -59,9 +59,9 @@ fn main() {
     let decoded = HashMap::<String, String>::from_bencode(&encoded, &mut off);
 
     for (key, value) in decoded.iter() {
-        println!("Key: {}, Value: {}", key, value);
+        println!("{}: {}", key, value);
     }
 
-    let stringify = std::str::from_utf8(&encoded).unwrap();
-    println!("{}", stringify);
+    //let stringify = std::str::from_utf8(&encoded).unwrap();
+    //println!("{}", stringify);
 }
