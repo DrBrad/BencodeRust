@@ -39,7 +39,6 @@ impl FromBencode for String {
     }
 }
 
-
 macro_rules! impl_decodable_number {
     ($($type:ty)*) => {
         $(
@@ -82,6 +81,34 @@ impl_decodable_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f
 
 
 
+impl<T> FromBencode for Vec<T> where T: FromBencode {
+
+    const TYPE: BencodeType = BencodeType::ARRAY;
+
+    fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
+        if BencodeType::type_by_prefix(buf[*off] as char) != <Vec<T> as FromBencode>::TYPE {
+            panic!("Buffer is not a bencode array.");
+        }
+
+            *off += 1;
+
+        let mut res = Vec::new();
+
+        while buf[*off] != <Vec<T> as FromBencode>::TYPE.suffix() as u8 {
+            let type_ = BencodeType::type_by_prefix(buf[*off] as char);
+
+            let item = match type_ {
+                BencodeType::NUMBER => T::from_bencode(buf, off),
+                BencodeType::BYTES => T::from_bencode(buf, off),
+                _ => unimplemented!()
+            };
+
+            res.push(item);
+        }
+
+        res
+    }
+}
 
 macro_rules! impl_decodable_iterable {
     ($($type:ident)*) => {
@@ -99,14 +126,7 @@ macro_rules! impl_decodable_iterable {
 
                     let mut res = $type::new();
 
-                    //println!("{}", type_);
-                    //println!("{:?}", type_);
-                    //println!("{}", buf[*off] as char);
-
                     while buf[*off] != <$type<T> as FromBencode>::TYPE.suffix() as u8 {
-                    //for off in 1..buf.len()-1 {
-
-
                         let type_ = BencodeType::type_by_prefix(buf[*off] as char);
 
                         let item = match type_ {
@@ -115,11 +135,8 @@ macro_rules! impl_decodable_iterable {
                             _ => unimplemented!()
                         };
 
-                        //MOVE BELOW INTO A DIFFERENT FUNCTION...
-
-                        res.push(item);
+                        res.push_back(item);
                     }
-
 
                     res
                 }
@@ -128,7 +145,7 @@ macro_rules! impl_decodable_iterable {
     };
 }
 
-impl_decodable_iterable!(Vec);// VecDeque LinkedList);
+impl_decodable_iterable!(VecDeque LinkedList);
 
 impl<K, V, S> FromBencode for HashMap<K, V, S> where K: FromBencode + Eq + Hash, V: FromBencode, S: BuildHasher + Default {
 
