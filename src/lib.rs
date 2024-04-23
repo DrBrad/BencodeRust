@@ -47,11 +47,13 @@ mod tests {
         */
 
 
+
         let mut obj = BencodeObject::new();
         obj.put("Hello World", "Another Test");
         obj.put("123123", "Bloop".to_string());
         obj.put("number", 100);
         obj.put("no", "123123");
+        obj.put("byt", &[ 0u8, 0u8, 0u8 ]);
         let encoded = obj.to_bencode();
         println!("{:?}", encoded);
 

@@ -17,6 +17,13 @@ impl<'a> BencodeBytes<'a> {
     }
 }
 
+impl<'a, const N: usize> From<&'a [u8; N]> for BencodeBytes<'a> {
+
+    fn from(value: &'a [u8; N]) -> Self {
+        Self(value)
+    }
+}
+
 impl<'a> From<&'a str> for BencodeBytes<'a> {
 
     fn from(value: &'a str) -> Self {

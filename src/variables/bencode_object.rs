@@ -62,6 +62,13 @@ impl<'a> BencodeObject<'a> {//: ToBencode + FromBencode
     }
 }
 
+impl<'a, const N: usize> Object<'a, &'a [u8; N]> for BencodeObject<'a> {
+
+    fn put(&mut self, key: &'a str, value: &'a [u8; N]) {
+        self.0.insert(BencodeBytes::from(key), BencodeVariables::BYTES(BencodeBytes::from(value)));
+    }
+}
+
 impl<'a> Object<'a, &'a str> for BencodeObject<'a> {
 
     fn put(&mut self, key: &'a str, value: &'a str) {
