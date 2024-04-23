@@ -22,14 +22,27 @@ impl<'a> BencodeBytes<'a> {
     */
 }
 
-/*
-impl From<String> for BencodeBytes {
+impl<'a> From<&'a str> for BencodeBytes<'a> {
 
-    fn from(value: String) -> Self {
-        BencodeBytes(value.as_bytes().to_vec())
+    fn from(value: &'a str) -> Self {
+        BencodeBytes(value.as_bytes())
     }
 }
-*/
+
+impl<'a> From<String> for BencodeBytes<'a> {
+
+    fn from(value: String) -> Self {
+        let bytes = value.as_ptr(); // Get raw pointer to string's buffer
+        let len = value.len(); // Get length of string
+        std::mem::forget(value); // Forget about the string to prevent double-free
+
+        // Safety: We assume that the pointer remains valid for the lifetime 'a
+        unsafe {
+            BencodeBytes(std::slice::from_raw_parts(bytes, len))
+        }
+        //BencodeBytes(value.as_bytes())
+    }
+}
 
 impl<'a> FromBencode<'a> for BencodeBytes<'a> {
 

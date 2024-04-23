@@ -11,9 +11,9 @@ mod tests {
 
     #[test]
     fn main() {
-        let test = "asdasd".as_bytes();
-        let test = BencodeBytes(test);
-        let encoded = test.to_bencode();
+        let z = "asdasd".to_string();
+        let original = BencodeBytes::from(z);
+        let encoded = original.to_bencode();
         println!("{:?}", encoded);
         let decoded = BencodeBytes::from_bencode(&encoded, &mut 0);
         println!("{}", decoded.as_string());
