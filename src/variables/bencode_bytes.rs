@@ -6,11 +6,15 @@ use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
-pub struct BencodeBytes<'a>(pub &'a [u8]);
+pub struct BencodeBytes<'a>(&'a [u8]);
 
 impl<'a> BencodeBytes<'a> {
 
     const TYPE: BencodeType = BencodeType::BYTES;
+
+    pub fn as_bytes(&self) -> &[u8] {
+        self.0
+    }
 
     pub fn as_string(&self) -> &str {
         from_utf8(self.0.clone()).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"))

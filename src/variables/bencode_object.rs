@@ -11,7 +11,7 @@ use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
 #[derive(Debug)]
-pub struct BencodeObject<'a>(pub OrderedMap<BencodeBytes<'a>, BencodeVariables<'a>>);
+pub struct BencodeObject<'a>(OrderedMap<BencodeBytes<'a>, BencodeVariables<'a>>);
 
 pub trait PutObject<'a, V> {
 
@@ -57,7 +57,7 @@ impl<'a> BencodeObject<'a> {//: ToBencode + FromBencode
         let key = BencodeBytes::from(key);
 
         match self.0.get(&key).unwrap() {
-            BencodeVariables::BYTES(bytes) => Ok(bytes.0),
+            BencodeVariables::BYTES(bytes) => Ok(bytes.as_bytes()),
             _ => Err(())
         }
     }

@@ -50,9 +50,17 @@ mod tests {
         */
 
 
+        let mut obj = BencodeObject::new();
+        obj.put("a", "foo");
+        obj.put("b", "bar");
+        obj.put("c", "far");
+
+        let encoded = obj.to_bencode();
+        println!("{:?}", encoded);
 
 
 
+        /*
         let mut obj = BencodeObject::new();
         obj.put("Hello World", "Another Test");
         obj.put("123123", "Bloop".to_string());
@@ -94,7 +102,7 @@ mod tests {
 
 
         println!("{}", decoded.get_number::<f64>("number").unwrap());
-
+        */
 
         /*
         let original = BencodeNumber::from(100.78);

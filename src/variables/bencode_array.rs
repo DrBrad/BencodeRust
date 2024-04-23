@@ -10,7 +10,7 @@ use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
 #[derive(Debug)]
-pub struct BencodeArray<'a>(pub Vec<BencodeVariables<'a>>);
+pub struct BencodeArray<'a>(Vec<BencodeVariables<'a>>);
 
 pub trait AddArray<'a, V> {
 
@@ -48,7 +48,7 @@ impl<'a> BencodeArray<'a> {//: ToBencode + FromBencode
 
     pub fn get_bytes(&'a self, index: usize) -> Result<&[u8], ()> {
         match self.0.get(index).unwrap() {
-            BencodeVariables::BYTES(bytes) => Ok(bytes.0),
+            BencodeVariables::BYTES(bytes) => Ok(bytes.as_bytes()),
             _ => Err(())
         }
     }
