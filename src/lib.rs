@@ -55,6 +55,7 @@ mod tests {
         obj.put("b", "bar");
         obj.put("c", "far");
         obj.put("n", 100);
+        obj.put("y", &[ 0u8, 0u8, 0u8, 0u8, 0u8, 0u8 ]);
 
         let mut arr = BencodeArray::new();
         arr.add("n");
