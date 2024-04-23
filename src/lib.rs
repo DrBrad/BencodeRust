@@ -56,6 +56,15 @@ mod tests {
         obj.put("c", "far");
         obj.put("n", 100);
 
+        let mut arr = BencodeArray::new();
+        arr.add("n");
+        arr.add(123.56);
+        obj.put("array", arr);
+
+        let mut obj2 = BencodeObject::new();
+        obj2.put("z", "another one");
+        obj.put("object", obj2);
+
         let encoded = obj.to_bencode();
         println!("{:?}", encoded);
 

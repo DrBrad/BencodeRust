@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt::format;
 use std::hash::Hash;
 use std::str::FromStr;
 use crate::BencodeVariables;
@@ -58,6 +59,22 @@ impl<'a> BencodeArray<'a> {//: ToBencode + FromBencode
             BencodeVariables::BYTES(bytes) => Ok(bytes.as_str()),
             _ => Err(())
         }
+    }
+
+    pub fn to_string(&self) -> String {
+        let mut res = "[\r\n".to_string();
+        for item in self.0.iter() {
+            let item = match item {
+                BencodeVariables::NUMBER(num) => format!("\t\x1b[33m{}\x1b[0m\r\n", num.to_string()), //31 KEY
+                BencodeVariables::ARRAY(arr) => format!("\t{}\r\n", arr.to_string().replace("\r\n", "\r\n\t")), //32 KEY
+                BencodeVariables::OBJECT(obj) => format!("\t{}\r\n", obj.to_string().replace("\r\n", "\r\n\t")), //32 KEY
+                BencodeVariables::BYTES(byt) => format!("\t\x1b[34m{:?}\x1b[0m\r\n", byt.to_string()), //31 KEY
+                _ => unimplemented!()
+            };
+            res.push_str(item.as_str());
+        }
+        res.push_str("]");
+        res
     }
 }
 

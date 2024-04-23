@@ -75,11 +75,13 @@ impl<'a> BencodeObject<'a> {//: ToBencode + FromBencode
         let mut res = "{\r\n".to_string();
         for key in self.0.keys() {
             let value = match self.0.get(&key).unwrap() {
-                BencodeVariables::BYTES(byt) => format!("\"{}\"", byt.to_string()),
-                BencodeVariables::NUMBER(num) => num.to_string(),
+                BencodeVariables::NUMBER(num) => format!("\t\x1b[31m{:?}\x1b[0m: \x1b[33m{}\x1b[0m\r\n", &key.to_string(), num.to_string()), //31 KEY
+                BencodeVariables::ARRAY(arr) => format!("\t\x1b[32m{:?}\x1b[0m: {}\r\n", &key.to_string(), arr.to_string().replace("\r\n", "\r\n\t")), //32 KEY
+                BencodeVariables::OBJECT(obj) => format!("\t\x1b[32m{:?}\x1b[0m: {}\r\n", &key.to_string(), obj.to_string().replace("\r\n", "\r\n\t")), //32 KEY
+                BencodeVariables::BYTES(byt) => format!("\t\x1b[31m{:?}\x1b[0m: \x1b[34m{:?}\x1b[0m\r\n", &key.to_string(), byt.to_string()), //31 KEY
                 _ => unimplemented!()
             };
-            res.push_str(format!("\t{:?}: {}\r\n", &key.to_string(), value).as_str());
+            res.push_str(value.as_str());
         }
         res.push_str("}");
         res
