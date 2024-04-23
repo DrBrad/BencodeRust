@@ -51,10 +51,12 @@ mod tests {
 
 
 
+
+
         let mut obj = BencodeObject::new();
         obj.put("Hello World", "Another Test");
         obj.put("123123", "Bloop".to_string());
-        obj.put("number", 100);
+        obj.put("number", 100.06);
         obj.put("no", "123123");
         obj.put("byt", &[ 0u8, 0u8, 0u8 ]);
 
@@ -77,7 +79,7 @@ mod tests {
         for key in decoded.0.keys() {
             println!("KEY: {}", key.as_string());
             let value = match decoded.0.get(key).unwrap() {
-                BencodeVariables::NUMBER(num) => println!("   {:?}", num.parse::<i32>()),
+                BencodeVariables::NUMBER(num) => println!("   {:?}", num.parse::<f32>()),
                 BencodeVariables::OBJECT(_) => {}
                 BencodeVariables::ARRAY(_) => {}
                 BencodeVariables::BYTES(bytes) => println!("   {:?}", bytes.as_string())
@@ -89,6 +91,9 @@ mod tests {
 
         println!("{}", decoded.get_object("2").unwrap().get_string("New").unwrap());
         println!("{:?}", decoded.get_array("arr").unwrap().get_string(0).unwrap());
+
+
+        println!("{}", decoded.get_number::<f64>("number").unwrap());
 
 
         /*

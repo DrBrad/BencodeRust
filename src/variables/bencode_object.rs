@@ -1,5 +1,6 @@
 //use std::collections::HashMap;
 use std::hash::Hash;
+use std::str::FromStr;
 use crate::utils::ordered_map::OrderedMap;
 use crate::BencodeVariables;
 use crate::variables::bencode_array::BencodeArray;
@@ -25,11 +26,11 @@ impl<'a> BencodeObject<'a> {//: ToBencode + FromBencode
         Self(OrderedMap::<BencodeBytes, BencodeVariables>::new())
     }
 
-    pub fn get_number(&'a self, key: &'a str) -> Result<i32, ()> {
+    pub fn get_number<V>(&'a self, key: &'a str) -> Result<V, ()> where V: FromStr {
         let key = BencodeBytes::from(key);
 
         match self.0.get(&key).unwrap() {
-            BencodeVariables::NUMBER(num) => Ok(num.parse()),
+            BencodeVariables::NUMBER(num) => Ok(num.parse::<V>()),
             _ => Err(())
         }
     }
@@ -71,6 +72,37 @@ impl<'a> BencodeObject<'a> {//: ToBencode + FromBencode
     }
 }
 
+/*
+impl<'a> GetObject<f32> for BencodeObject<'a> {
+    fn get(&self, key: &str) -> f32 {
+        let key = BencodeBytes::from(key);
+
+        match self.0.get(&key).unwrap() {
+            BencodeVariables::NUMBER(num) => num.parse(),
+            _ => 0.0
+        }
+    }
+}
+
+impl<'a> GetObject<i32> for BencodeObject<'a> {
+    fn get(&self, key: &str) -> i32 {
+        let key = BencodeBytes::from(key);
+
+        match self.0.get(&key).unwrap() {
+            BencodeVariables::NUMBER(num) => num.parse(),
+            _ => 0
+        }
+    }
+}
+
+
+impl<'a> GetObject<&'a str> for BencodeObject<'a> {
+
+    fn get<&'a str>(&self, key: &str) -> &'a str {
+        &"asdasd"
+    }
+}
+*/
 impl<'a, const N: usize> PutObject<'a, &'a [u8; N]> for BencodeObject<'a> {
 
     fn put(&mut self, key: &'a str, value: &'a [u8; N]) {

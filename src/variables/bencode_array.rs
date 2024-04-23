@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::str::FromStr;
 use crate::BencodeVariables;
 use crate::variables::bencode_bytes::BencodeBytes;
 use crate::variables::bencode_number::BencodeNumber;
@@ -24,9 +25,9 @@ impl<'a> BencodeArray<'a> {//: ToBencode + FromBencode
         Self(Vec::new())
     }
 
-    pub fn get_number(&'a self, index: usize) -> Result<i32, ()> {
+    pub fn get_number<V>(&'a self, index: usize) -> Result<V, ()> where V: FromStr {
         match self.0.get(index).unwrap() {
-            BencodeVariables::NUMBER(num) => Ok(num.parse()),
+            BencodeVariables::NUMBER(num) => Ok(num.parse::<V>()),
             _ => Err(())
         }
     }
