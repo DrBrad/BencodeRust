@@ -11,13 +11,13 @@ Implemented Types
 
 | Data | Structure | Default Impl |
 | ---  | ---       | ---          |
-| Vec  | ✔         | Defines own ordering |
-| VecDeque | ✔     | Defines own ordering |
-| LinkedList | ✔   | Defines own ordering |
-| HashMap | ✔      | Ordering missing but content is ordered by key byte representation. |
-| BTreeMap | ✔     | Defines own ordering |
+| Vec  | X         | Defines own ordering |
+| VecDeque | X     | Defines own ordering |
+| LinkedList | X   | Defines own ordering |
+| HashMap | X      | Ordering missing but content is ordered by key byte representation. |
+| BTreeMap | X     | Defines own ordering |
 | Every Number Type | ✔     | i8-64 u8-64 f32-64 usize |
-| String Types | ✔     | Premitive & Object |
+| String Types | ✔     | Premitive & Object & u8 array |
 
 Usage
 -----
@@ -27,13 +27,18 @@ Here are some examples of how to use the Bencode library.
 ```rust
 use crate::variables::to_bencode::ToBencode;
 use crate::variables::from_bencode::FromBencode;
+use crate::variables::bencode_object::{BencodeObject, PutObject};
 
 fn main() {
-    let encoded = "blank test".to_bencode();
+    let mut original = BencodeObject::new();
+    original.put("a", "foo");
+    original.put("b", "bar");
+    original.put("c", 456.78);
+    let encoded = original.to_bencode();
     println!("{:?}", encoded);
 
-    let decoded = String::from_bencode(&encoded, &mut 0);
-    println!("{}", decoded);
+    let decoded = BencodeObject::from_bencode(&encoded, &mut 0);
+    println!("{}", decoded.to_string());
 }
 ```
 
