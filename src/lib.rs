@@ -23,6 +23,7 @@ mod tests {
     use crate::variables::to_bencode::ToBencode;
     use crate::variables::from_bencode::FromBencode;
     use crate::variables::bencode_bytes::BencodeBytes;
+    use crate::variables::bencode_number::BencodeNumber;
     use crate::variables::bencode_object::BencodeObject;
 
     #[test]
@@ -54,6 +55,14 @@ mod tests {
         for key in decoded.0.keys() {
             println!("{} => {}", key.as_string(), decoded.0.get(key).unwrap().as_string());
         }
+
+
+        let original = BencodeNumber::from(100);
+        let encoded = original.to_bencode();
+        println!("{:?}", encoded);
+        let decoded = BencodeNumber::from_bencode(&encoded, &mut 0);
+        let num: i32 = decoded.parse();
+        println!("{:?}", num);
 
 
         //BencodeVariables::BYTES(BencodeBytes::from(""));

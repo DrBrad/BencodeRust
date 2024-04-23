@@ -61,7 +61,7 @@ impl<'a> FromBencode<'a> for BencodeBytes<'a> {
     }
 }
 
-impl<'a> ToBencode for BencodeBytes<'_> {
+impl<'a> ToBencode for BencodeBytes<'a> {
 
     fn to_bencode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::new();
