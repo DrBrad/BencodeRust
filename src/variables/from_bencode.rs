@@ -84,7 +84,7 @@ impl<T> FromBencode for Vec<T> where T: FromBencode {
             panic!("Buffer is not a bencode array.");
         }
 
-            *off += 1;
+        *off += 1;
 
         let mut res = Vec::new();
 

@@ -1,9 +1,25 @@
+use crate::variables::bencode_array::BencodeArray;
+use crate::variables::bencode_bytes::BencodeBytes;
+use crate::variables::bencode_number::BencodeNumber;
+use crate::variables::bencode_object::BencodeObject;
+
 pub mod variables;
+
+/*
+pub enum BencodeVariables<'a> {
+    NUMBER(BencodeNumber),
+    OBJECT(BencodeObject<'a, BencodeVariables<'a>>),
+    ARRAY(BencodeArray<BencodeVariables<'a>>),
+    BYTES(BencodeBytes<'a>)
+}
+*/
 
 #[cfg(test)]
 mod tests {
 
     use std::collections::HashMap;
+    use crate::variables::bencode_array::BencodeArray;
+    //use crate::BencodeVariables;
     use crate::variables::to_bencode::ToBencode;
     use crate::variables::from_bencode::FromBencode;
     use crate::variables::bencode_bytes::BencodeBytes;
@@ -16,6 +32,31 @@ mod tests {
         println!("{:?}", encoded);
         let decoded = BencodeBytes::from_bencode(&encoded, &mut 0);
         println!("{}", decoded.as_string());
+
+        //ARRAY TEST
+        let mut arr = BencodeArray::new();
+        arr.0.push(BencodeBytes::from("Hello world"));
+        arr.0.push(BencodeBytes::from("This Test"));
+        let encoded = arr.to_bencode();
+        println!("{:?}", encoded);
+        let decoded = BencodeArray::<BencodeBytes>::from_bencode(&encoded, &mut 0);
+        for item in decoded.0 {
+            println!("{}", item.as_string());
+        }
+
+
+        let mut obj = BencodeObject::new();
+        obj.0.insert(BencodeBytes::from("Hello World"), BencodeBytes::from("Another Test"));
+        obj.0.insert(BencodeBytes::from("123123"), BencodeBytes::from("Bloop"));
+        let encoded = obj.to_bencode();
+        println!("{:?}", encoded);
+        let decoded = BencodeObject::<BencodeBytes>::from_bencode(&encoded, &mut 0);
+        for key in decoded.0.keys() {
+            println!("{} => {}", key.as_string(), decoded.0.get(key).unwrap().as_string());
+        }
+
+
+        //BencodeVariables::BYTES(BencodeBytes::from(""));
 
         /*
         let mut obj = BencodeObject(HashMap::new());
