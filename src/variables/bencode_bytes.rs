@@ -5,7 +5,7 @@ use crate::variables::from_bencode::FromBencode;
 use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Debug, Eq, Hash, PartialEq, Clone)]
 pub struct BencodeBytes<'a>(pub &'a [u8]);
 
 impl<'a> BencodeBytes<'a> {

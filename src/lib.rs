@@ -4,6 +4,7 @@ use crate::variables::bencode_number::BencodeNumber;
 use crate::variables::bencode_object::BencodeObject;
 
 pub mod variables;
+pub mod utils;
 
 pub enum BencodeVariables<'a> {
     NUMBER(BencodeNumber<'a>),

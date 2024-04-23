@@ -1,5 +1,6 @@
-use std::collections::HashMap;
+//use std::collections::HashMap;
 use std::hash::Hash;
+use crate::utils::ordered_map::OrderedMap;
 use crate::BencodeVariables;
 use crate::variables::bencode_bytes::BencodeBytes;
 use crate::variables::bencode_number::BencodeNumber;
@@ -8,7 +9,7 @@ use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
 //#[derive(Debug, PartialEq)]
-pub struct BencodeObject<'a>(pub HashMap<BencodeBytes<'a>, BencodeVariables<'a>>);
+pub struct BencodeObject<'a>(pub OrderedMap<BencodeBytes<'a>, BencodeVariables<'a>>);
 
 pub trait Object<'a, V> {
 
@@ -20,7 +21,7 @@ impl<'a> BencodeObject<'a> {//: ToBencode + FromBencode
     const TYPE: BencodeType = BencodeType::OBJECT;
 
     pub fn new() -> Self {
-        Self(HashMap::<BencodeBytes, BencodeVariables>::new())
+        Self(OrderedMap::<BencodeBytes, BencodeVariables>::new())
     }
 
     pub fn get_number(&'a self, key: &'a str) -> i32 {
@@ -107,7 +108,7 @@ impl<'a> FromBencode<'a> for BencodeObject<'a> {
 
         *off += 1;
 
-        let mut res = HashMap::<BencodeBytes, BencodeVariables>::with_hasher(Default::default());
+        let mut res = OrderedMap::<BencodeBytes, BencodeVariables>::new();//::with_hasher(Default::default());
 
         while buf[*off] != Self::TYPE.suffix() as u8 {
             let key = BencodeBytes::from_bencode(buf, off);
