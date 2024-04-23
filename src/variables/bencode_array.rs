@@ -60,6 +60,31 @@ impl<'a> AddArray<'a, BencodeObject<'a>> for BencodeArray<'a> {
     }
 }
 
+macro_rules! impl_array_number {
+    ($($type:ty)*) => {
+        $(
+            impl<'a> AddArray<'a, $type> for BencodeArray<'a> {
+
+                fn add(&mut self, value: $type) {
+                    self.0.push(BencodeVariables::NUMBER(BencodeNumber::from(value)));
+                }
+
+                /*
+                fn get(&'a self, key: &'a str) -> Result<$type, ()> {
+                    let key = BencodeBytes::from(key);
+
+                    match self.0.get(&key).unwrap() {
+                        BencodeVariables::NUMBER(num) => Ok(num.parse()),
+                        _ => Err(())
+                    }
+                }*/
+            }
+        )*
+    }
+}
+
+impl_array_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
+
 impl<'a> FromBencode<'a> for BencodeArray<'a> {
 
     fn from_bencode(buf: &'a Vec<u8>, off: &mut usize) -> Self {

@@ -62,7 +62,7 @@ mod tests {
 
         let mut arr = BencodeArray::new();
         arr.add("Hello World");
-        //arr.add(100);
+        arr.add(100);
         obj.put("arr", arr);
 
         let encoded = obj.to_bencode();
