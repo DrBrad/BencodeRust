@@ -10,8 +10,8 @@ pub mod utils;
 #[derive(Debug)]
 pub enum BencodeVariables<'a> {
     NUMBER(BencodeNumber<'a>),
-    OBJECT(BencodeObject<'a>),
     ARRAY(BencodeArray<'a>),
+    OBJECT(BencodeObject<'a>),
     BYTES(BencodeBytes<'a>)
 }
 
