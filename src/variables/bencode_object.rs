@@ -2,6 +2,7 @@
 use std::hash::Hash;
 use crate::utils::ordered_map::OrderedMap;
 use crate::BencodeVariables;
+use crate::variables::bencode_array::BencodeArray;
 use crate::variables::bencode_bytes::BencodeBytes;
 use crate::variables::bencode_number::BencodeNumber;
 use crate::variables::from_bencode::FromBencode;
@@ -11,7 +12,7 @@ use crate::variables::to_bencode::ToBencode;
 //#[derive(Debug, PartialEq)]
 pub struct BencodeObject<'a>(pub OrderedMap<BencodeBytes<'a>, BencodeVariables<'a>>);
 
-pub trait Object<'a, V> {
+pub trait PutObject<'a, V> {
 
     fn put(&mut self, key: &'a str, value: V);
 }
@@ -24,74 +25,96 @@ impl<'a> BencodeObject<'a> {//: ToBencode + FromBencode
         Self(OrderedMap::<BencodeBytes, BencodeVariables>::new())
     }
 
-    pub fn get_number(&'a self, key: &'a str) -> i32 {
+    pub fn get_number(&'a self, key: &'a str) -> Result<i32, ()> {
         let key = BencodeBytes::from(key);
-        let p = self.0.get(&key).unwrap();
 
-        match p {
-            BencodeVariables::NUMBER(num) => num.parse(),
-            _ => panic!("Requested key is not a number")
+        match self.0.get(&key).unwrap() {
+            BencodeVariables::NUMBER(num) => Ok(num.parse()),
+            _ => Err(())
         }
     }
 
-    pub fn get_bytes(&'a self, key: &'a str) -> &[u8] {
+    pub fn get_object(&'a self, key: &'a str) -> Result<&BencodeObject, ()> {
         let key = BencodeBytes::from(key);
-        let p = self.0.get(&key).unwrap();
 
-        match p {
-            BencodeVariables::NUMBER(_) => &[0u8; 0],
-            BencodeVariables::OBJECT(_) => &[0u8; 0],
-            BencodeVariables::ARRAY(_) => &[0u8; 0],
-            BencodeVariables::BYTES(bytes) => bytes.0
+        match self.0.get(&key).unwrap() {
+            BencodeVariables::OBJECT(obj) => Ok(obj),
+            _ => Err(())
         }
-        //&[0u8]
-
     }
 
-    pub fn get_string(&'a self, key: &'a str) -> &str {
+    pub fn get_bytes(&'a self, key: &'a str) -> Result<&[u8], ()> {
         let key = BencodeBytes::from(key);
-        let p = self.0.get(&key).unwrap();
 
-        match p {
-            BencodeVariables::NUMBER(_) => &"",
-            BencodeVariables::OBJECT(_) => &"",
-            BencodeVariables::ARRAY(_) => &"",
-            BencodeVariables::BYTES(bytes) => bytes.as_string()
+        match self.0.get(&key).unwrap() {
+            BencodeVariables::BYTES(bytes) => Ok(bytes.0),
+            _ => Err(())
         }
-        //&[0u8]
+    }
 
+    pub fn get_string(&'a self, key: &'a str) -> Result<&str, ()> {
+        let key = BencodeBytes::from(key);
+
+        match self.0.get(&key).unwrap() {
+            BencodeVariables::BYTES(bytes) => Ok(bytes.as_string()),
+            _ => Err(())
+        }
     }
 }
 
-impl<'a, const N: usize> Object<'a, &'a [u8; N]> for BencodeObject<'a> {
+impl<'a, const N: usize> PutObject<'a, &'a [u8; N]> for BencodeObject<'a> {
 
     fn put(&mut self, key: &'a str, value: &'a [u8; N]) {
         self.0.insert(BencodeBytes::from(key), BencodeVariables::BYTES(BencodeBytes::from(value)));
     }
 }
 
-impl<'a> Object<'a, &'a str> for BencodeObject<'a> {
+impl<'a> PutObject<'a, &'a str> for BencodeObject<'a> {
 
     fn put(&mut self, key: &'a str, value: &'a str) {
         self.0.insert(BencodeBytes::from(key), BencodeVariables::BYTES(BencodeBytes::from(value)));
     }
 }
 
-impl<'a> Object<'a, String> for BencodeObject<'a> {
+impl<'a> PutObject<'a, String> for BencodeObject<'a> {
 
     fn put(&mut self, key: &'a str, value: String) {
         self.0.insert(BencodeBytes::from(key), BencodeVariables::BYTES(BencodeBytes::from(value)));
     }
 }
 
+impl<'a> PutObject<'a, BencodeArray<'a>> for BencodeObject<'a> {
+
+    fn put(&mut self, key: &'a str, value: BencodeArray<'a>) {
+        self.0.insert(BencodeBytes::from(key), BencodeVariables::ARRAY(value));
+    }
+}
+
+impl<'a> PutObject<'a, BencodeObject<'a>> for BencodeObject<'a> {
+
+    fn put(&mut self, key: &'a str, value: BencodeObject<'a>) {
+        self.0.insert(BencodeBytes::from(key), BencodeVariables::OBJECT(value));
+    }
+}
+
 macro_rules! impl_object_number {
     ($($type:ty)*) => {
         $(
-            impl<'a> Object<'a, $type> for BencodeObject<'a> {
+            impl<'a> PutObject<'a, $type> for BencodeObject<'a> {
 
                 fn put(&mut self, key: &'a str, value: $type) {
                     self.0.insert(BencodeBytes::from(key), BencodeVariables::NUMBER(BencodeNumber::from(value)));
                 }
+
+                /*
+                fn get(&'a self, key: &'a str) -> Result<$type, ()> {
+                    let key = BencodeBytes::from(key);
+
+                    match self.0.get(&key).unwrap() {
+                        BencodeVariables::NUMBER(num) => Ok(num.parse()),
+                        _ => Err(())
+                    }
+                }*/
             }
         )*
     }
@@ -115,10 +138,12 @@ impl<'a> FromBencode<'a> for BencodeObject<'a> {
 
             let type_ = BencodeType::type_by_prefix(buf[*off] as char);
 
-            println!("{:?}", type_);
+            //println!("{:?}", type_);
 
             let value = match type_ {
                 BencodeType::NUMBER => BencodeVariables::NUMBER(BencodeNumber::from_bencode(buf, off)),
+                BencodeType::ARRAY => BencodeVariables::ARRAY(BencodeArray::from_bencode(buf, off)),
+                BencodeType::OBJECT => BencodeVariables::OBJECT(BencodeObject::from_bencode(buf, off)),
                 BencodeType::BYTES => BencodeVariables::BYTES(BencodeBytes::from_bencode(buf, off)),
                 _ => unimplemented!()
             };
@@ -141,8 +166,8 @@ impl<'a> ToBencode for BencodeObject<'a> {
             buf.extend_from_slice(&key.to_bencode());
             let value = match value {
                 BencodeVariables::NUMBER(num) => num.to_bencode(),
-                //BencodeVariables::OBJECT(obj) => &obj.to_bencode(),
-                //BencodeVariables::ARRAY(arr) => &arr.to_bencode(),
+                BencodeVariables::OBJECT(obj) => obj.to_bencode(),
+                BencodeVariables::ARRAY(arr) => arr.to_bencode(),
                 BencodeVariables::BYTES(byt) => byt.to_bencode(),
                 _ => Vec::new()
             };

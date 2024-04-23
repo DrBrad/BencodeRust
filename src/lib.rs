@@ -9,7 +9,7 @@ pub mod utils;
 pub enum BencodeVariables<'a> {
     NUMBER(BencodeNumber<'a>),
     OBJECT(BencodeObject<'a>),
-    ARRAY(BencodeArray<BencodeVariables<'a>>),
+    ARRAY(BencodeArray<'a>),
     BYTES(BencodeBytes<'a>)
 }
 
@@ -18,13 +18,13 @@ mod tests {
 
     use std::collections::HashMap;
     use crate::BencodeVariables;
-    use crate::variables::bencode_array::BencodeArray;
+    use crate::variables::bencode_array::{AddArray, BencodeArray};
     //use crate::BencodeVariables;
     use crate::variables::to_bencode::ToBencode;
     use crate::variables::from_bencode::FromBencode;
     use crate::variables::bencode_bytes::BencodeBytes;
     use crate::variables::bencode_number::BencodeNumber;
-    use crate::variables::bencode_object::{BencodeObject, Object};
+    use crate::variables::bencode_object::{BencodeObject, PutObject};
 
     #[test]
     fn main() {
@@ -55,10 +55,20 @@ mod tests {
         obj.put("number", 100);
         obj.put("no", "123123");
         obj.put("byt", &[ 0u8, 0u8, 0u8 ]);
+
+        let mut obj2 = BencodeObject::new();
+        obj2.put("New", "NEW OBJECT");
+        obj.put("2", obj2);
+
+        let mut arr = BencodeArray::new();
+        arr.add("Hello World");
+        //arr.add(100);
+        obj.put("arr", arr);
+
         let encoded = obj.to_bencode();
         println!("{:?}", encoded);
 
-        //println!("{}", String::from_utf8(encoded).unwrap());
+        println!("{}", String::from_utf8(encoded.clone()).unwrap());
 
         let decoded = BencodeObject::from_bencode(&encoded, &mut 0);
         for key in decoded.0.keys() {
@@ -72,7 +82,8 @@ mod tests {
             //println!("{} => {}", key.as_string(), value);
         }
 
-        //println!("{}", decoded.get_number("number"));
+
+        println!("{}", decoded.get_object("2").unwrap().get_string("New").unwrap());
 
 
         /*
