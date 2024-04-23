@@ -5,19 +5,18 @@ use crate::variables::bencode_object::BencodeObject;
 
 pub mod variables;
 
-/*
 pub enum BencodeVariables<'a> {
-    NUMBER(BencodeNumber),
-    OBJECT(BencodeObject<'a, BencodeVariables<'a>>),
+    NUMBER(BencodeNumber<'a>),
+    OBJECT(BencodeObject<'a>),
     ARRAY(BencodeArray<BencodeVariables<'a>>),
     BYTES(BencodeBytes<'a>)
 }
-*/
 
 #[cfg(test)]
 mod tests {
 
     use std::collections::HashMap;
+    use crate::BencodeVariables;
     use crate::variables::bencode_array::BencodeArray;
     //use crate::BencodeVariables;
     use crate::variables::to_bencode::ToBencode;
@@ -28,6 +27,7 @@ mod tests {
 
     #[test]
     fn main() {
+        /*
         let original = BencodeBytes::from("asdasd");
         let encoded = original.to_bencode();
         println!("{:?}", encoded);
@@ -44,25 +44,41 @@ mod tests {
         for item in decoded.0 {
             println!("{}", item.as_string());
         }
+        */
 
 
         let mut obj = BencodeObject::new();
-        obj.0.insert(BencodeBytes::from("Hello World"), BencodeBytes::from("Another Test"));
-        obj.0.insert(BencodeBytes::from("123123"), BencodeBytes::from("Bloop"));
+        obj.put("Hello World", "Another Test");
+        obj.put("123123", "Bloop");
+        obj.put_int("number", 100);
         let encoded = obj.to_bencode();
         println!("{:?}", encoded);
-        let decoded = BencodeObject::<BencodeBytes>::from_bencode(&encoded, &mut 0);
+
+        //println!("{}", String::from_utf8(encoded).unwrap());
+
+        let decoded = BencodeObject::from_bencode(&encoded, &mut 0);
         for key in decoded.0.keys() {
-            println!("{} => {}", key.as_string(), decoded.0.get(key).unwrap().as_string());
+            let value = match decoded.0.get(key).unwrap() {
+                BencodeVariables::NUMBER(num) => println!("{} => {}", key.as_string(), num.parse::<i32>()),
+                BencodeVariables::OBJECT(_) => {}
+                BencodeVariables::ARRAY(_) => {}
+                BencodeVariables::BYTES(bytes) => println!("{} => {}", key.as_string(), bytes.as_string())
+            };
+            //decoded.get_string(key.as_string()))
+            //println!("{} => {}", key.as_string(), value);
         }
 
+        //println!("{}", decoded.get_number("number"));
 
-        let original = BencodeNumber::from(100);
+
+        /*
+        let original = BencodeNumber::from(100.78);
         let encoded = original.to_bencode();
         println!("{:?}", encoded);
         let decoded = BencodeNumber::from_bencode(&encoded, &mut 0);
-        let num: i32 = decoded.parse();
+        let num: f32 = decoded.parse();
         println!("{:?}", num);
+        */
 
 
         //BencodeVariables::BYTES(BencodeBytes::from(""));
