@@ -11,10 +11,18 @@ mod tests {
 
     #[test]
     fn main() {
+        let test = "asdasd".as_bytes();
+        let test = BencodeBytes(test);
+        let encoded = test.to_bencode();
+        println!("{:?}", encoded);
+        let decoded = BencodeBytes::from_bencode(&encoded, &mut 0);
+        println!("{}", decoded.as_string());
 
+        /*
         let mut obj = BencodeObject(HashMap::new());
-        obj.0.insert(BencodeBytes::from("hello".to_string()), BencodeBytes::from("world".to_string()));
-        obj.0.insert(BencodeBytes::from("net".to_string()), BencodeBytes::from("test".to_string()));
+
+        //obj.0.insert(BencodeBytes::from("hello".to_string()), BencodeBytes::from("world".to_string()));
+        //obj.0.insert(BencodeBytes::from("net".to_string()), BencodeBytes::from("test".to_string()));
 
         let encoded = obj.to_bencode();
         println!("{:?}", encoded);
@@ -23,6 +31,7 @@ mod tests {
         for key in decoded.0.keys() {
             println!("{} => {}", key.as_string(), decoded.0.get(key).unwrap().as_string());
         }
+        */
 
 
         /*

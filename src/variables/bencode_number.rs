@@ -16,9 +16,9 @@ impl BencodeNumber {
     */
 }
 
-impl FromBencode for BencodeNumber {
+impl<'a> FromBencode<'a> for BencodeNumber {
 
-    fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
+    fn from_bencode(buf: &'a Vec<u8>, off: &mut usize) -> Self {
         /*
         if BencodeType::type_by_prefix(buf[*off] as char) != Self::TYPE {
             panic!("Buffer is not a bencode bytes / string.");

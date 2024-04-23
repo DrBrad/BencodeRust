@@ -6,17 +6,17 @@ use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
 //#[derive(Debug, PartialEq)]
-pub struct BencodeObject<V>(pub HashMap<BencodeBytes, V>);
+pub struct BencodeObject<'a, V>(pub HashMap<BencodeBytes<'a>, V>);
 
-impl<V> BencodeObject<V> {//: ToBencode + FromBencode
+impl<'a, V> BencodeObject<'_, V> {//: ToBencode + FromBencode
 
     const TYPE: BencodeType = BencodeType::OBJECT;
 
 }
+/*
+impl<'a, V> FromBencode for BencodeObject<'_, V> where V: FromBencode {
 
-impl<V> FromBencode for BencodeObject<V> where V: FromBencode {
-
-    fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
+    fn from_bencode<'a>(buf: &'a Vec<u8>, off: &mut usize) -> Self {
         if BencodeType::type_by_prefix(buf[*off] as char) != Self::TYPE {
             panic!("Buffer is not a bencode array.");
         }
@@ -43,8 +43,8 @@ impl<V> FromBencode for BencodeObject<V> where V: FromBencode {
         BencodeObject(res)
     }
 }
-
-impl<V> ToBencode for BencodeObject<V> where V: ToBencode {
+*/
+impl<'a, V> ToBencode for BencodeObject<'_, V> where V: ToBencode {
 
     fn to_bencode(&self) -> Vec<u8> {
         let mut buf: Vec<u8> = Vec::new();

@@ -4,11 +4,11 @@ use std::str::from_utf8;
 use std::cmp::Ord;
 use crate::variables::inter::bencode_type::BencodeType;
 
-pub trait FromBencode {
+pub trait FromBencode<'a> {
 
     //const TYPE: BencodeType;
 
-    fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self;
+    fn from_bencode(buf: &'a Vec<u8>, off: &mut usize) -> Self;
 }
 
 /*

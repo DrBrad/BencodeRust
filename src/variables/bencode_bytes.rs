@@ -3,27 +3,41 @@ use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
 #[derive(Debug, Eq, Hash, PartialEq)]
-pub struct BencodeBytes(pub Vec<u8>);
+pub struct BencodeBytes<'a>(pub &'a [u8]);//Vec<u8>
 
-impl BencodeBytes {
+impl<'a> BencodeBytes<'a> {
 
     const TYPE: BencodeType = BencodeType::BYTES;
 
-    pub fn as_string(&self) -> String {
-        String::from_utf8(self.0.clone()).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"))
+    pub fn as_string(&self) -> &str {
+        std::str::from_utf8(self.0.clone()).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"))
     }
+
+    /*
+    fn from_bencode(buf: &'a Vec<u8>, off: &mut usize) -> Self {
+        let bytes = &buf[*off..];
+        *off = buf.len();
+        BencodeBytes(bytes)
+    }
+    */
 }
 
+/*
 impl From<String> for BencodeBytes {
 
     fn from(value: String) -> Self {
         BencodeBytes(value.as_bytes().to_vec())
     }
 }
+*/
 
-impl FromBencode for BencodeBytes {
+impl<'a> FromBencode<'a> for BencodeBytes<'a> {
 
-    fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
+    fn from_bencode(buf: &'a Vec<u8>, off: &mut usize) -> Self {
+        //let bytes = &buf[*off..];
+        //*off = buf.len();
+        //BencodeBytes(bytes)
+
         if BencodeType::type_by_prefix(buf[*off] as char) != Self::TYPE {
             panic!("Buffer is not a bencode bytes / string.");
         }
@@ -37,22 +51,22 @@ impl FromBencode for BencodeBytes {
         }
 
         let length = len_bytes.iter().take(*off - start).fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
-        let bytes = buf[*off + 1..*off + 1 + length].to_vec();
+        let bytes = &buf[*off + 1..*off + 1 + length];//.to_vec();
 
         *off += 1+length;
 
-        BencodeBytes(bytes)
+        Self(bytes)
     }
 }
 
-impl ToBencode for BencodeBytes {
+impl<'a> ToBencode for BencodeBytes<'_> {
 
     fn to_bencode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::new();
 
         r.extend_from_slice(self.0.len().to_string().as_bytes());
         r.push(Self::TYPE.delimiter() as u8);
-        r.extend(self.0.clone());
+        r.extend_from_slice(self.0.clone());
         r
     }
 }
