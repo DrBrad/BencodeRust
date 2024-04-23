@@ -52,7 +52,7 @@ impl_decodable_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f
 impl<'a> FromBencode<'a> for BencodeNumber<'a> {
 
     fn from_bencode(buf: &'a Vec<u8>, off: &mut usize) -> Self {
-        if BencodeType::type_by_prefix(buf[*off] as char) != Self::TYPE {
+        if BencodeType::type_by_prefix(buf[*off]) != Self::TYPE {
             panic!("Buffer is not a bencode bytes / string.");
         }
 
@@ -79,10 +79,9 @@ impl<'a> ToBencode for BencodeNumber<'a> {
     fn to_bencode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::new();
 
-        r.push(Self::TYPE.prefix() as u8);
+        r.push(Self::TYPE.prefix());
         r.extend_from_slice(self.0);
-        //r.extend(self.0.clone());
-        r.push(Self::TYPE.suffix() as u8);
+        r.push(Self::TYPE.suffix());
         r
     }
 }

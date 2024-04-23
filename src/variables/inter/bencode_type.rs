@@ -10,40 +10,39 @@ pub enum BencodeType {
 
 impl BencodeType {
 
-    pub fn is_prefix(&self, c: char) -> bool {
+    pub fn is_prefix(&self, c: u8) -> bool {
         match self {
-            BencodeType::BYTES => c >= '0' && c <= '9',
-            _ => c == self.prefix(),
+            BencodeType::BYTES => c >= b'0' && c <= b'9',
+            _ => c == self.prefix()
         }
     }
 
-    pub fn prefix(&self) -> char {
+    pub fn prefix(&self) -> u8 {
         match self {
-            BencodeType::NUMBER => 'i',
-            BencodeType::OBJECT => 'd',
-            BencodeType::ARRAY => 'l',
-            BencodeType::BYTES => '\0',
-            _ => '\0'
+            BencodeType::NUMBER => b'i',
+            BencodeType::OBJECT => b'd',
+            BencodeType::ARRAY => b'l',
+            _ => unimplemented!()
         }
     }
 
-    pub fn suffix(&self) -> char {
+    pub fn suffix(&self) -> u8 {
         match self {
-            BencodeType::NUMBER => 'e',
-            BencodeType::ARRAY => 'e',
-            BencodeType::OBJECT => 'e',
-            _ => '\0',
+            BencodeType::NUMBER => b'e',
+            BencodeType::ARRAY => b'e',
+            BencodeType::OBJECT => b'e',
+            _ => unimplemented!()
         }
     }
 
-    pub fn delimiter(&self) -> char {
+    pub fn delimiter(&self) -> u8 {
         match self {
-            BencodeType::BYTES => ':',
-            _ => '\0',
+            BencodeType::BYTES => b':',
+            _ => unimplemented!()
         }
     }
 
-    pub fn type_by_prefix(c: char) -> Self {
+    pub fn type_by_prefix(c: u8) -> Self {
         for btype in [BencodeType::NUMBER, BencodeType::ARRAY, BencodeType::OBJECT, BencodeType::BYTES] {
             if btype.is_prefix(c) {
                 return btype;
