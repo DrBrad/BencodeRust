@@ -8,7 +8,7 @@ use crate::variables::from_bencode::FromBencode;
 use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
-//#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct BencodeArray<'a>(pub Vec<BencodeVariables<'a>>);
 
 pub trait AddArray<'a, V> {
@@ -22,6 +22,41 @@ impl<'a> BencodeArray<'a> {//: ToBencode + FromBencode
 
     pub fn new() -> Self {
         Self(Vec::new())
+    }
+
+    pub fn get_number(&'a self, index: usize) -> Result<i32, ()> {
+        match self.0.get(index).unwrap() {
+            BencodeVariables::NUMBER(num) => Ok(num.parse()),
+            _ => Err(())
+        }
+    }
+
+    pub fn get_array(&'a self, index: usize) -> Result<&BencodeArray, ()> {
+        match self.0.get(index).unwrap() {
+            BencodeVariables::ARRAY(arr) => Ok(arr),
+            _ => Err(())
+        }
+    }
+
+    pub fn get_object(&'a self, index: usize) -> Result<&BencodeObject, ()> {
+        match self.0.get(index).unwrap() {
+            BencodeVariables::OBJECT(obj) => Ok(obj),
+            _ => Err(())
+        }
+    }
+
+    pub fn get_bytes(&'a self, index: usize) -> Result<&[u8], ()> {
+        match self.0.get(index).unwrap() {
+            BencodeVariables::BYTES(bytes) => Ok(bytes.0),
+            _ => Err(())
+        }
+    }
+
+    pub fn get_string(&'a self, index: usize) -> Result<&str, ()> {
+        match self.0.get(index).unwrap() {
+            BencodeVariables::BYTES(bytes) => Ok(bytes.as_string()),
+            _ => Err(())
+        }
     }
 }
 
@@ -122,6 +157,8 @@ impl<'a> FromBencode<'a> for BencodeArray<'a> {
             res.push(item);
         }
 
+        *off += 1;
+
         Self(res)
     }
 }
@@ -135,10 +172,10 @@ impl<'a> ToBencode for BencodeArray<'a> {
         for item in &self.0 {
             let item = match item {
                 BencodeVariables::NUMBER(num) => num.to_bencode(),
-                BencodeVariables::OBJECT(obj) => obj.to_bencode(),
                 BencodeVariables::ARRAY(arr) => arr.to_bencode(),
+                BencodeVariables::OBJECT(obj) => obj.to_bencode(),
                 BencodeVariables::BYTES(byt) => byt.to_bencode(),
-                _ => Vec::new()
+                _ => unimplemented!()
             };
             buf.extend_from_slice(&item);
         }

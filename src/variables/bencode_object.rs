@@ -9,7 +9,7 @@ use crate::variables::from_bencode::FromBencode;
 use crate::variables::inter::bencode_type::BencodeType;
 use crate::variables::to_bencode::ToBencode;
 
-//#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct BencodeObject<'a>(pub OrderedMap<BencodeBytes<'a>, BencodeVariables<'a>>);
 
 pub trait PutObject<'a, V> {
@@ -30,6 +30,15 @@ impl<'a> BencodeObject<'a> {//: ToBencode + FromBencode
 
         match self.0.get(&key).unwrap() {
             BencodeVariables::NUMBER(num) => Ok(num.parse()),
+            _ => Err(())
+        }
+    }
+
+    pub fn get_array(&'a self, key: &'a str) -> Result<&BencodeArray, ()> {
+        let key = BencodeBytes::from(key);
+
+        match self.0.get(&key).unwrap() {
+            BencodeVariables::ARRAY(arr) => Ok(arr),
             _ => Err(())
         }
     }
@@ -151,6 +160,8 @@ impl<'a> FromBencode<'a> for BencodeObject<'a> {
             res.insert(key, value);
         }
 
+        *off += 1;
+
 
         Self(res)
     }
@@ -166,8 +177,8 @@ impl<'a> ToBencode for BencodeObject<'a> {
             buf.extend_from_slice(&key.to_bencode());
             let value = match value {
                 BencodeVariables::NUMBER(num) => num.to_bencode(),
-                BencodeVariables::OBJECT(obj) => obj.to_bencode(),
                 BencodeVariables::ARRAY(arr) => arr.to_bencode(),
+                BencodeVariables::OBJECT(obj) => obj.to_bencode(),
                 BencodeVariables::BYTES(byt) => byt.to_bencode(),
                 _ => Vec::new()
             };
