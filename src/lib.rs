@@ -54,9 +54,12 @@ mod tests {
         obj.put("a", "foo");
         obj.put("b", "bar");
         obj.put("c", "far");
+        obj.put("n", 100);
 
         let encoded = obj.to_bencode();
         println!("{:?}", encoded);
+
+        println!("{}", obj.to_string());
 
 
 

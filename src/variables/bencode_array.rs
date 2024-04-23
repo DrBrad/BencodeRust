@@ -55,7 +55,7 @@ impl<'a> BencodeArray<'a> {//: ToBencode + FromBencode
 
     pub fn get_string(&'a self, index: usize) -> Result<&str, ()> {
         match self.0.get(index).unwrap() {
-            BencodeVariables::BYTES(bytes) => Ok(bytes.as_string()),
+            BencodeVariables::BYTES(bytes) => Ok(bytes.as_str()),
             _ => Err(())
         }
     }

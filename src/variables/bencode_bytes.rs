@@ -16,8 +16,12 @@ impl<'a> BencodeBytes<'a> {
         self.0
     }
 
-    pub fn as_string(&self) -> &str {
-        from_utf8(self.0.clone()).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"))
+    pub fn as_str(&self) -> &str {
+        from_utf8(&self.0).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"))
+    }
+
+    pub fn to_string(&self) -> String {
+        String::from_utf8_lossy(&self.0).to_string()
     }
 }
 
@@ -79,7 +83,7 @@ impl<'a> ToBencode for BencodeBytes<'a> {
 
         r.extend_from_slice(self.0.len().to_string().as_bytes());
         r.push(Self::TYPE.delimiter() as u8);
-        r.extend_from_slice(self.0.clone());
+        r.extend_from_slice(&self.0);
         r
     }
 }

@@ -66,43 +66,26 @@ impl<'a> BencodeObject<'a> {//: ToBencode + FromBencode
         let key = BencodeBytes::from(key);
 
         match self.0.get(&key).unwrap() {
-            BencodeVariables::BYTES(bytes) => Ok(bytes.as_string()),
+            BencodeVariables::BYTES(bytes) => Ok(bytes.as_str()),
             _ => Err(())
         }
     }
-}
 
-/*
-impl<'a> GetObject<f32> for BencodeObject<'a> {
-    fn get(&self, key: &str) -> f32 {
-        let key = BencodeBytes::from(key);
-
-        match self.0.get(&key).unwrap() {
-            BencodeVariables::NUMBER(num) => num.parse(),
-            _ => 0.0
+    pub fn to_string(&self) -> String {
+        let mut res = "{\r\n".to_string();
+        for key in self.0.keys() {
+            let value = match self.0.get(&key).unwrap() {
+                BencodeVariables::BYTES(byt) => format!("\"{}\"", byt.to_string()),
+                BencodeVariables::NUMBER(num) => num.to_string(),
+                _ => unimplemented!()
+            };
+            res.push_str(format!("\t{:?}: {}\r\n", &key.to_string(), value).as_str());
         }
+        res.push_str("}");
+        res
     }
 }
 
-impl<'a> GetObject<i32> for BencodeObject<'a> {
-    fn get(&self, key: &str) -> i32 {
-        let key = BencodeBytes::from(key);
-
-        match self.0.get(&key).unwrap() {
-            BencodeVariables::NUMBER(num) => num.parse(),
-            _ => 0
-        }
-    }
-}
-
-
-impl<'a> GetObject<&'a str> for BencodeObject<'a> {
-
-    fn get<&'a str>(&self, key: &str) -> &'a str {
-        &"asdasd"
-    }
-}
-*/
 impl<'a, const N: usize> PutObject<'a, &'a [u8; N]> for BencodeObject<'a> {
 
     fn put(&mut self, key: &'a str, value: &'a [u8; N]) {

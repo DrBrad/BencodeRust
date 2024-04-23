@@ -16,6 +16,10 @@ impl<'a> BencodeNumber<'a> {
         let str = from_utf8(&self.0).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
         str.parse::<V>().unwrap_or_else(|_| panic!("Failed to parse to Number"))
     }
+
+    pub fn to_string(&self) -> String {
+        String::from_utf8_lossy(&self.0).to_string()
+    }
 }
 
 
