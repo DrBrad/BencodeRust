@@ -13,8 +13,8 @@ mod tests {
     fn main() {
 
         let mut obj = BencodeObject(HashMap::new());
-        obj.0.insert(BencodeBytes("hello".as_bytes().to_vec()), BencodeBytes("world".as_bytes().to_vec()));
-        obj.0.insert(BencodeBytes("net".as_bytes().to_vec()), BencodeBytes("test".as_bytes().to_vec()));
+        obj.0.insert(BencodeBytes::from("hello".to_string()), BencodeBytes::from("world".to_string()));
+        obj.0.insert(BencodeBytes::from("net".to_string()), BencodeBytes::from("test".to_string()));
 
         let encoded = obj.to_bencode();
         println!("{:?}", encoded);

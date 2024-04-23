@@ -14,6 +14,13 @@ impl BencodeBytes {
     }
 }
 
+impl From<String> for BencodeBytes {
+
+    fn from(value: String) -> Self {
+        BencodeBytes(value.as_bytes().to_vec())
+    }
+}
+
 impl FromBencode for BencodeBytes {
 
     fn from_bencode(buf: &Vec<u8>, off: &mut usize) -> Self {
