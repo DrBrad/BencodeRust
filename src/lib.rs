@@ -23,7 +23,7 @@ mod tests {
     use crate::variables::from_bencode::FromBencode;
     use crate::variables::bencode_bytes::BencodeBytes;
     use crate::variables::bencode_number::BencodeNumber;
-    use crate::variables::bencode_object::BencodeObject;
+    use crate::variables::bencode_object::{BencodeObject, Object};
 
     #[test]
     fn main() {
@@ -49,8 +49,9 @@ mod tests {
 
         let mut obj = BencodeObject::new();
         obj.put("Hello World", "Another Test");
-        obj.put("123123", "Bloop");
-        obj.put_int("number", 100);
+        obj.put("123123", "Bloop".to_string());
+        obj.put("number", 100);
+        obj.put("no", "123123");
         let encoded = obj.to_bencode();
         println!("{:?}", encoded);
 
@@ -59,10 +60,10 @@ mod tests {
         let decoded = BencodeObject::from_bencode(&encoded, &mut 0);
         for key in decoded.0.keys() {
             let value = match decoded.0.get(key).unwrap() {
-                BencodeVariables::NUMBER(num) => println!("{} => {}", key.as_string(), num.parse::<i32>()),
+                BencodeVariables::NUMBER(num) => println!("{} => {:?}", key.as_string(), num.parse::<i32>()),
                 BencodeVariables::OBJECT(_) => {}
                 BencodeVariables::ARRAY(_) => {}
-                BencodeVariables::BYTES(bytes) => println!("{} => {}", key.as_string(), bytes.as_string())
+                BencodeVariables::BYTES(bytes) => println!("{} => {:?}", key.as_string(), bytes.as_string())
             };
             //decoded.get_string(key.as_string()))
             //println!("{} => {}", key.as_string(), value);

@@ -10,6 +10,11 @@ use crate::variables::to_bencode::ToBencode;
 //#[derive(Debug, PartialEq)]
 pub struct BencodeObject<'a>(pub HashMap<BencodeBytes<'a>, BencodeVariables<'a>>);
 
+pub trait Object<'a, V> {
+
+    fn put(&mut self, key: &'a str, value: V);
+}
+
 impl<'a> BencodeObject<'a> {//: ToBencode + FromBencode
 
     const TYPE: BencodeType = BencodeType::OBJECT;
@@ -18,28 +23,14 @@ impl<'a> BencodeObject<'a> {//: ToBencode + FromBencode
         Self(HashMap::<BencodeBytes, BencodeVariables>::new())
     }
 
-    pub fn put(&mut self, key: &'a str, value: &'a str) {
-        self.0.insert(BencodeBytes::from(key), BencodeVariables::BYTES(BencodeBytes::from(value)));
-    }
-
-    pub fn put_int(&mut self, key: &'a str, value: i32) {
-        self.0.insert(BencodeBytes::from(key), BencodeVariables::NUMBER(BencodeNumber::from(value)));
-    }
-
     pub fn get_number(&'a self, key: &'a str) -> i32 {
         let key = BencodeBytes::from(key);
         let p = self.0.get(&key).unwrap();
 
-        let z: i32 = match p {
+        match p {
             BencodeVariables::NUMBER(num) => num.parse(),
-            BencodeVariables::OBJECT(_) => 0,
-            BencodeVariables::ARRAY(_) => 0,
-            BencodeVariables::BYTES(_) => 0
-        };
-
-        z
-        //&[0u8]
-
+            _ => panic!("Requested key is not a number")
+        }
     }
 
     pub fn get_bytes(&'a self, key: &'a str) -> &[u8] {
@@ -70,6 +61,35 @@ impl<'a> BencodeObject<'a> {//: ToBencode + FromBencode
 
     }
 }
+
+impl<'a> Object<'a, &'a str> for BencodeObject<'a> {
+
+    fn put(&mut self, key: &'a str, value: &'a str) {
+        self.0.insert(BencodeBytes::from(key), BencodeVariables::BYTES(BencodeBytes::from(value)));
+    }
+}
+
+impl<'a> Object<'a, String> for BencodeObject<'a> {
+
+    fn put(&mut self, key: &'a str, value: String) {
+        self.0.insert(BencodeBytes::from(key), BencodeVariables::BYTES(BencodeBytes::from(value)));
+    }
+}
+
+macro_rules! impl_object_number {
+    ($($type:ty)*) => {
+        $(
+            impl<'a> Object<'a, $type> for BencodeObject<'a> {
+
+                fn put(&mut self, key: &'a str, value: $type) {
+                    self.0.insert(BencodeBytes::from(key), BencodeVariables::NUMBER(BencodeNumber::from(value)));
+                }
+            }
+        )*
+    }
+}
+
+impl_object_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
 
 impl<'a> FromBencode<'a> for BencodeObject<'a> {
 
