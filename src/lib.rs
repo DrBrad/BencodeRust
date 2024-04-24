@@ -33,8 +33,8 @@ mod tests {
         obj2.put("z", "another one");
         obj.put("object", obj2);
 
-        let z = obj.get_object("object").unwrap();
-        z.put("hello", "world");
+        //let z = obj.get_object("object").unwrap();
+        //z.put("hello", "world");
 
         //let encoded = obj.encode();
         //println!("{:?}", encoded);

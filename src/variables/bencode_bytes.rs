@@ -92,13 +92,13 @@ impl<'a> Bencode<'a> for BencodeBytes {
         }
 
         let length = len_bytes.iter().take(off - s).fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
-        let bytes = &buf[off + 1..off + 1 + length];
+        let bytes = buf[off + 1..off + 1 + length].to_vec();
 
         off += 1+length;
         s = off-s;
 
         Self {
-            b: bytes.to_vec(),
+            b: bytes,
             s
         }
     }
