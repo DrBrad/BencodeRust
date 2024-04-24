@@ -56,25 +56,25 @@ impl_decodable_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f
 
 impl<'a> Bencode<'a> for BencodeNumber<'a> {
 
-    fn decode(buf: &'a [u8], off: &mut usize) -> Self {
-        if BencodeType::type_by_prefix(buf[*off]) != Self::TYPE {
+    fn decode_with_offset(buf: &'a [u8], off: usize) -> Self {
+        if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
             panic!("Buffer is not a bencode bytes / string.");
         }
 
-        *off += 1;
+        let mut off = off+1;
 
         let mut c = [0u8; 32];
-        let mut s = *off;
+        let mut s = off;
 
-        while buf[*off] != Self::TYPE.suffix() {
-            c[*off - s] = buf[*off];
-            *off += 1;
+        while buf[off] != Self::TYPE.suffix() {
+            c[off - s] = buf[off];
+            off += 1;
         }
 
-        let bytes = &buf[s..*off];
+        let bytes = &buf[s..off];
 
-        *off += 1;
-        s = *off+1-s;
+        off += 1;
+        s = off+1-s;
 
         Self {
             n: bytes,

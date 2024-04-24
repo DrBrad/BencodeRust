@@ -10,7 +10,6 @@ pub mod utils;
 //- add remove option
 //- add if contains option
 //- oberserver and mutable get IE get_mut
-//- do decode without using *off... or dont require the offset to be mut
 
 
 #[derive(Debug)]
@@ -53,7 +52,7 @@ mod tests {
 
         println!("{}", obj.to_string());
 
-        let decoded = BencodeObject::decode(encoded, &mut 0);
+        let decoded = BencodeObject::decode(encoded);
         println!("{}", decoded.to_string());
     }
 

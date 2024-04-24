@@ -70,24 +70,25 @@ impl<'a> From<String> for BencodeBytes<'a> {
 
 impl<'a> Bencode<'a> for BencodeBytes<'a> {
 
-    fn decode(buf: &'a [u8], off: &mut usize) -> Self {
-        if BencodeType::type_by_prefix(buf[*off]) != Self::TYPE {
+    fn decode_with_offset(buf: &'a [u8], off: usize) -> Self {
+        if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
             panic!("Buffer is not a bencode bytes / string.");
         }
 
+        let mut off = off;
         let mut len_bytes = [0u8; 8];
-        let mut s = *off;
+        let mut s = off;
 
-        while buf[*off] != Self::TYPE.delimiter() {
-            len_bytes[*off - s] = buf[*off];
-            *off += 1;
+        while buf[off] != Self::TYPE.delimiter() {
+            len_bytes[off - s] = buf[off];
+            off += 1;
         }
 
-        let length = len_bytes.iter().take(*off - s).fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
-        let bytes = &buf[*off + 1..*off + 1 + length];
+        let length = len_bytes.iter().take(off - s).fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
+        let bytes = &buf[off + 1..off + 1 + length];
 
-        *off += 1+length;
-        s = *off-s;
+        off += 1+length;
+        s = off-s;
 
         Self {
             b: bytes,
