@@ -70,7 +70,7 @@ impl<'a> From<String> for BencodeBytes<'a> {
 
 impl<'a> Bencode<'a> for BencodeBytes<'a> {
 
-    fn from_bencode(buf: &'a Vec<u8>, off: &mut usize) -> Self {
+    fn from_bencode(buf: &'a [u8], off: &mut usize) -> Self {
         if BencodeType::type_by_prefix(buf[*off]) != Self::TYPE {
             panic!("Buffer is not a bencode bytes / string.");
         }

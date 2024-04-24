@@ -174,7 +174,7 @@ impl_object_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64)
 
 impl<'a> Bencode<'a> for BencodeObject<'a> {
 
-    fn from_bencode(buf: &'a Vec<u8>, off: &mut usize) -> Self {
+    fn from_bencode(buf: &'a [u8], off: &mut usize) -> Self {
         if BencodeType::type_by_prefix(buf[*off]) != Self::TYPE {
             panic!("Buffer is not a bencode array.");
         }

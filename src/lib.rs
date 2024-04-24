@@ -52,10 +52,7 @@ mod tests {
 
         println!("{}", obj.to_string());
 
-
-        let z = encoded.to_vec();
-
-        let decoded = BencodeObject::from_bencode(&z, &mut 0);
+        let decoded = BencodeObject::from_bencode(encoded, &mut 0);
         println!("{}", decoded.to_string());
     }
 
