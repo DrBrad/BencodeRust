@@ -27,12 +27,13 @@ mod tests {
 
         let mut obj = BencodeObject::new();
         obj.put("object", BencodeObject::new());
-        /*
         {
             let mut m = obj.get_object("object").unwrap();
             m.put("string", "strong");
         }
-        */
+
+        println!("{}", obj.to_string());
+        /*
         {
             let key = BencodeBytes::from("object");
 
@@ -41,8 +42,7 @@ mod tests {
                 _ => unimplemented!()
             }
         }
-
-        println!("{}", obj.to_string());
+        */
 
         /*
         obj.put("b", "bar");
