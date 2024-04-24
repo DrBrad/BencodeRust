@@ -25,7 +25,7 @@ Here are some examples of how to use the Bencode library.
 
 **Bencode**
 ```rust
-use crate::variables::bencode::Bencode;
+use crate::variables::bencode_variable::Bencode;
 use crate::variables::bencode_object::{BencodeObject, PutObject};
 
 fn main() {
