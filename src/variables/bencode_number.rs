@@ -25,8 +25,6 @@ impl<'a> BencodeNumber<'a> {
     }
 }
 
-
-
 macro_rules! impl_decodable_number {
     ($($type:ty)*) => {
         $(
