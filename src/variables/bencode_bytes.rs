@@ -1,41 +1,51 @@
 use std::str::from_utf8;
 use std::slice::from_raw_parts;
 
-use crate::variables::from_bencode::FromBencode;
+use crate::variables::inter::bencode::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
-use crate::variables::to_bencode::ToBencode;
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
-pub struct BencodeBytes<'a>(&'a [u8]);
+pub struct BencodeBytes<'a> {
+    b: &'a [u8],
+    s: usize
+}//(&'a [u8]);
 
 impl<'a> BencodeBytes<'a> {
 
     const TYPE: BencodeType = BencodeType::BYTES;
 
     pub fn as_bytes(&self) -> &[u8] {
-        self.0
+        self.b
     }
 
     pub fn as_str(&self) -> &str {
-        from_utf8(&self.0).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"))
+        from_utf8(&self.b).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"))
     }
 
     pub fn to_string(&self) -> String {
-        String::from_utf8_lossy(&self.0).to_string()
+        String::from_utf8_lossy(&self.b).to_string()
     }
 }
 
 impl<'a, const N: usize> From<&'a [u8; N]> for BencodeBytes<'a> {
 
     fn from(value: &'a [u8; N]) -> Self {
-        Self(value)
+        Self {
+            b: value,
+            s: value.len()+value.len().to_string().len()+1
+        }
     }
 }
 
 impl<'a> From<&'a str> for BencodeBytes<'a> {
 
     fn from(value: &'a str) -> Self {
-        Self(value.as_bytes())
+        let value = value.as_bytes();
+
+        Self {
+            b: value,
+            s: value.len()+value.len().to_string().len()+1
+        }
     }
 }
 
@@ -47,12 +57,17 @@ impl<'a> From<String> for BencodeBytes<'a> {
         std::mem::forget(value);
 
         unsafe {
-            Self(from_raw_parts(bytes, len))
+            let value = from_raw_parts(bytes, len);
+
+            Self {
+                b: value,//from_raw_parts(bytes, len),
+                s: value.len()+value.len().to_string().len()+1
+            }
         }
     }
 }
 
-impl<'a> FromBencode<'a> for BencodeBytes<'a> {
+impl<'a> Bencode<'a> for BencodeBytes<'a> {
 
     fn from_bencode(buf: &'a Vec<u8>, off: &mut usize) -> Self {
         if BencodeType::type_by_prefix(buf[*off]) != Self::TYPE {
@@ -72,18 +87,22 @@ impl<'a> FromBencode<'a> for BencodeBytes<'a> {
 
         *off += 1+length;
 
-        Self(bytes)
+        Self {
+            b: bytes,
+            s: (*off - start)+length+1
+        }
     }
-}
-
-impl<'a> ToBencode for BencodeBytes<'a> {
 
     fn to_bencode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::new();
 
-        r.extend_from_slice(self.0.len().to_string().as_bytes());
+        r.extend_from_slice(self.b.len().to_string().as_bytes());
         r.push(Self::TYPE.delimiter());
-        r.extend_from_slice(&self.0);
+        r.extend_from_slice(&self.b);
         r
+    }
+
+    fn byte_size(&self) -> usize {
+        self.s
     }
 }

@@ -1,24 +1,26 @@
 use std::str::{from_utf8, FromStr};
 use std::slice::from_raw_parts;
 
-use crate::variables::from_bencode::FromBencode;
+use crate::variables::inter::bencode::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
-use crate::variables::to_bencode::ToBencode;
 
 #[derive(Debug, Eq, Hash, PartialEq)]
-pub struct BencodeNumber<'a>(&'a [u8]);
+pub struct BencodeNumber<'a>{
+    n: &'a [u8],
+    s: usize
+}
 
 impl<'a> BencodeNumber<'a> {
 
     const TYPE: BencodeType = BencodeType::NUMBER;
 
     pub fn parse<V>(&self) -> V where V: FromStr {
-        let str = from_utf8(&self.0).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
+        let str = from_utf8(&self.n).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
         str.parse::<V>().unwrap_or_else(|_| panic!("Failed to parse to Number"))
     }
 
     pub fn to_string(&self) -> String {
-        String::from_utf8_lossy(&self.0).to_string()
+        String::from_utf8_lossy(&self.n).to_string()
     }
 }
 
@@ -37,7 +39,10 @@ macro_rules! impl_decodable_number {
                     std::mem::forget(value);
 
                     unsafe {
-                        Self(from_raw_parts(bytes, len))
+                        Self {
+                            n: from_raw_parts(bytes, len),
+                            s: 10
+                        }
                     }
                 }
             }
@@ -49,7 +54,7 @@ impl_decodable_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f
 
 
 
-impl<'a> FromBencode<'a> for BencodeNumber<'a> {
+impl<'a> Bencode<'a> for BencodeNumber<'a> {
 
     fn from_bencode(buf: &'a Vec<u8>, off: &mut usize) -> Self {
         if BencodeType::type_by_prefix(buf[*off]) != Self::TYPE {
@@ -70,18 +75,22 @@ impl<'a> FromBencode<'a> for BencodeNumber<'a> {
 
         *off += 1;
 
-        Self(bytes)
+        Self {
+            n: bytes,
+            s: 10
+        }
     }
-}
-
-impl<'a> ToBencode for BencodeNumber<'a> {
 
     fn to_bencode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::new();
 
         r.push(Self::TYPE.prefix());
-        r.extend_from_slice(self.0);
+        r.extend_from_slice(self.n);
         r.push(Self::TYPE.suffix());
         r
+    }
+
+    fn byte_size(&self) -> usize {
+        self.s
     }
 }

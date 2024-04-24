@@ -6,6 +6,11 @@ use crate::variables::bencode_object::BencodeObject;
 pub mod variables;
 pub mod utils;
 
+//TODO
+//- add remove option
+//- add if contains option
+//- oberserver and mutable get IE get_mut
+
 
 #[derive(Debug)]
 pub enum BencodeVariables<'a> {
@@ -19,9 +24,10 @@ pub enum BencodeVariables<'a> {
 mod tests {
 
     use crate::variables::bencode_array::{AddArray, BencodeArray};
-    use crate::variables::to_bencode::ToBencode;
+    //use crate::variables::to_bencode::Be;
     //use crate::variables::from_bencode::FromBencode;
     use crate::variables::bencode_object::{BencodeObject, PutObject};
+    use crate::variables::inter::bencode::Bencode;
 
     #[test]
     fn main() {

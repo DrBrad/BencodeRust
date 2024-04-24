@@ -3,12 +3,14 @@ use crate::BencodeVariables;
 use crate::variables::bencode_bytes::BencodeBytes;
 use crate::variables::bencode_number::BencodeNumber;
 use crate::variables::bencode_object::BencodeObject;
-use crate::variables::from_bencode::FromBencode;
+use crate::variables::inter::bencode::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
-use crate::variables::to_bencode::ToBencode;
 
 #[derive(Debug)]
-pub struct BencodeArray<'a>(Vec<BencodeVariables<'a>>);
+pub struct BencodeArray<'a> {
+    l: Vec<BencodeVariables<'a>>,
+    s: usize
+}
 
 pub trait AddArray<'a, V> {
 
@@ -20,39 +22,42 @@ impl<'a> BencodeArray<'a> {
     const TYPE: BencodeType = BencodeType::ARRAY;
 
     pub fn new() -> Self {
-        Self(Vec::new())
+        Self {
+            l: Vec::new(),
+            s: 2
+        }
     }
 
     pub fn get_number<V>(&'a self, index: usize) -> Result<V, ()> where V: FromStr {
-        match self.0.get(index).unwrap() {
+        match self.l.get(index).unwrap() {
             BencodeVariables::NUMBER(num) => Ok(num.parse::<V>()),
             _ => Err(())
         }
     }
 
     pub fn get_array(&'a self, index: usize) -> Result<&BencodeArray, ()> {
-        match self.0.get(index).unwrap() {
+        match self.l.get(index).unwrap() {
             BencodeVariables::ARRAY(arr) => Ok(arr),
             _ => Err(())
         }
     }
 
     pub fn get_object(&'a self, index: usize) -> Result<&BencodeObject, ()> {
-        match self.0.get(index).unwrap() {
+        match self.l.get(index).unwrap() {
             BencodeVariables::OBJECT(obj) => Ok(obj),
             _ => Err(())
         }
     }
 
     pub fn get_bytes(&'a self, index: usize) -> Result<&[u8], ()> {
-        match self.0.get(index).unwrap() {
+        match self.l.get(index).unwrap() {
             BencodeVariables::BYTES(bytes) => Ok(bytes.as_bytes()),
             _ => Err(())
         }
     }
 
     pub fn get_string(&'a self, index: usize) -> Result<&str, ()> {
-        match self.0.get(index).unwrap() {
+        match self.l.get(index).unwrap() {
             BencodeVariables::BYTES(bytes) => Ok(bytes.as_str()),
             _ => Err(())
         }
@@ -61,7 +66,7 @@ impl<'a> BencodeArray<'a> {
     pub fn to_string(&self) -> String {
         let mut res = "[\r\n".to_string();
 
-        for item in self.0.iter() {
+        for item in self.l.iter() {
             let item = match item {
                 BencodeVariables::NUMBER(num) => format!("\t\x1b[33m{}\x1b[0m\r\n", num.to_string()),
                 BencodeVariables::ARRAY(arr) => format!("\t{}\r\n", arr.to_string().replace("\r\n", "\r\n\t")),
@@ -79,42 +84,55 @@ impl<'a> BencodeArray<'a> {
 impl<'a> From<Vec<BencodeVariables<'a>>> for BencodeArray<'a> {
 
     fn from(value: Vec<BencodeVariables<'a>>) -> Self {
-        Self(value)
+        //WE NEED TO COUNT THE SIZE...
+
+        Self {
+            l: value,
+            s: 2
+        }
     }
 }
 
 impl<'a, const N: usize> AddArray<'a, &'a [u8; N]> for BencodeArray<'a> {
 
     fn add(&mut self, value: &'a [u8; N]) {
-        self.0.push(BencodeVariables::BYTES(BencodeBytes::from(value)));
+        let value = BencodeBytes::from(value);
+        self.s += value.byte_size();
+        self.l.push(BencodeVariables::BYTES(value));
     }
 }
 
 impl<'a> AddArray<'a, &'a str> for BencodeArray<'a> {
 
     fn add(&mut self, value: &'a str) {
-        self.0.push(BencodeVariables::BYTES(BencodeBytes::from(value)));
+        let value = BencodeBytes::from(value);
+        self.s += value.byte_size();
+        self.l.push(BencodeVariables::BYTES(value));
     }
 }
 
 impl<'a> AddArray<'a, String> for BencodeArray<'a> {
 
     fn add(&mut self, value: String) {
-        self.0.push(BencodeVariables::BYTES(BencodeBytes::from(value)));
+        let value = BencodeBytes::from(value);
+        self.s += value.byte_size();
+        self.l.push(BencodeVariables::BYTES(value));
     }
 }
 
 impl<'a> AddArray<'a, BencodeArray<'a>> for BencodeArray<'a> {
 
     fn add(&mut self, value: BencodeArray<'a>) {
-        self.0.push(BencodeVariables::ARRAY(value));
+        self.s += value.byte_size();
+        self.l.push(BencodeVariables::ARRAY(value));
     }
 }
 
 impl<'a> AddArray<'a, BencodeObject<'a>> for BencodeArray<'a> {
 
     fn add(&mut self, value: BencodeObject<'a>) {
-        self.0.push(BencodeVariables::OBJECT(value));
+        self.s += value.byte_size();
+        self.l.push(BencodeVariables::OBJECT(value));
     }
 }
 
@@ -124,7 +142,9 @@ macro_rules! impl_array_number {
             impl<'a> AddArray<'a, $type> for BencodeArray<'a> {
 
                 fn add(&mut self, value: $type) {
-                    self.0.push(BencodeVariables::NUMBER(BencodeNumber::from(value)));
+                    let value = BencodeNumber::from(value);
+                    self.s += value.byte_size();
+                    self.l.push(BencodeVariables::NUMBER(value));
                 }
             }
         )*
@@ -133,7 +153,7 @@ macro_rules! impl_array_number {
 
 impl_array_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
 
-impl<'a> FromBencode<'a> for BencodeArray<'a> {
+impl<'a> Bencode<'a> for BencodeArray<'a> {
 
     fn from_bencode(buf: &'a Vec<u8>, off: &mut usize) -> Self {
         if BencodeType::type_by_prefix(buf[*off]) != Self::TYPE {
@@ -160,17 +180,17 @@ impl<'a> FromBencode<'a> for BencodeArray<'a> {
 
         *off += 1;
 
-        Self(res)
+        Self {
+            l: res,
+            s: 10
+        }
     }
-}
-
-impl<'a> ToBencode for BencodeArray<'a> {
 
     fn to_bencode(&self) -> Vec<u8> {
         let mut buf: Vec<u8> = Vec::new();
         buf.push(Self::TYPE.prefix());
 
-        for item in &self.0 {
+        for item in &self.l {
             let item = match item {
                 BencodeVariables::NUMBER(num) => num.to_bencode(),
                 BencodeVariables::ARRAY(arr) => arr.to_bencode(),
@@ -182,5 +202,9 @@ impl<'a> ToBencode for BencodeArray<'a> {
 
         buf.push(Self::TYPE.suffix());
         buf
+    }
+
+    fn byte_size(&self) -> usize {
+        self.s
     }
 }
