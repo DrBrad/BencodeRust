@@ -70,7 +70,7 @@ impl<'a> From<String> for BencodeBytes<'a> {
 
 impl<'a> Bencode<'a> for BencodeBytes<'a> {
 
-    fn from_bencode(buf: &'a [u8], off: &mut usize) -> Self {
+    fn decode(buf: &'a [u8], off: &mut usize) -> Self {
         if BencodeType::type_by_prefix(buf[*off]) != Self::TYPE {
             panic!("Buffer is not a bencode bytes / string.");
         }
@@ -105,7 +105,7 @@ impl<'a> Bencode<'a> for BencodeBytes<'a> {
         r
     }
     */
-    fn to_bencode(&self) -> &[u8] {
+    fn encode(&self) -> &[u8] {
         let mut data = vec![0u8; self.s];
 
         let len_str = self.b.len().to_string();

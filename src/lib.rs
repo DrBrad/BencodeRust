@@ -47,12 +47,12 @@ mod tests {
         obj2.put("z", "another one");
         obj.put("object", obj2);
 
-        let encoded = obj.to_bencode();
+        let encoded = obj.encode();
         println!("{:?}", encoded);
 
         println!("{}", obj.to_string());
 
-        let decoded = BencodeObject::from_bencode(encoded, &mut 0);
+        let decoded = BencodeObject::decode(encoded, &mut 0);
         println!("{}", decoded.to_string());
     }
 

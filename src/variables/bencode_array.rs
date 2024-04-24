@@ -157,7 +157,7 @@ impl_array_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
 
 impl<'a> Bencode<'a> for BencodeArray<'a> {
 
-    fn from_bencode(buf: &'a [u8], off: &mut usize) -> Self {
+    fn decode(buf: &'a [u8], off: &mut usize) -> Self {
         if BencodeType::type_by_prefix(buf[*off]) != Self::TYPE {
             panic!("Buffer is not a bencode array.");
         }
@@ -171,10 +171,10 @@ impl<'a> Bencode<'a> for BencodeArray<'a> {
             let type_ = BencodeType::type_by_prefix(buf[*off]);
 
             let item = match type_ {
-                BencodeType::NUMBER => BencodeVariables::NUMBER(BencodeNumber::from_bencode(buf, off)),
-                BencodeType::ARRAY => BencodeVariables::ARRAY(BencodeArray::from_bencode(buf, off)),
-                BencodeType::OBJECT => BencodeVariables::OBJECT(BencodeObject::from_bencode(buf, off)),
-                BencodeType::BYTES => BencodeVariables::BYTES(BencodeBytes::from_bencode(buf, off)),
+                BencodeType::NUMBER => BencodeVariables::NUMBER(BencodeNumber::decode(buf, off)),
+                BencodeType::ARRAY => BencodeVariables::ARRAY(BencodeArray::decode(buf, off)),
+                BencodeType::OBJECT => BencodeVariables::OBJECT(BencodeObject::decode(buf, off)),
+                BencodeType::BYTES => BencodeVariables::BYTES(BencodeBytes::decode(buf, off)),
                 _ => unimplemented!()
             };
 
@@ -209,7 +209,7 @@ impl<'a> Bencode<'a> for BencodeArray<'a> {
         buf
     }
     */
-    fn to_bencode(&self) -> &[u8] {
+    fn encode(&self) -> &[u8] {
         let mut data = vec![0u8; self.s];
         let mut index = 0;
 
@@ -217,14 +217,14 @@ impl<'a> Bencode<'a> for BencodeArray<'a> {
         index += 1;
 
         for item in &self.l {
-            let item_bencode = match item {
-                BencodeVariables::NUMBER(num) => num.to_bencode(),
-                BencodeVariables::ARRAY(arr) => arr.to_bencode(),
-                BencodeVariables::OBJECT(obj) => obj.to_bencode(),
-                BencodeVariables::BYTES(byt) => byt.to_bencode(),
+            let item = match item {
+                BencodeVariables::NUMBER(num) => num.encode(),
+                BencodeVariables::ARRAY(arr) => arr.encode(),
+                BencodeVariables::OBJECT(obj) => obj.encode(),
+                BencodeVariables::BYTES(byt) => byt.encode(),
             };
-            let item_len = item_bencode.len();
-            data[index..index + item_len].copy_from_slice(&item_bencode);
+            let item_len = item.len();
+            data[index..index + item_len].copy_from_slice(&item);
             index += item_len;
         }
 
