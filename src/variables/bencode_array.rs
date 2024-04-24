@@ -10,7 +10,7 @@ use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Clone)]
 pub struct BencodeArray<'a> {
-    l: Vec<BencodeVariable<'a>>,
+    pub l: Vec<BencodeVariable<'a>>,
     s: usize
 }
 
@@ -37,15 +37,15 @@ impl<'a> BencodeArray<'a> {
         }
     }
 
-    pub fn get_array(&'a self, index: usize) -> Result<&BencodeArray, ()> {
-        match self.l.get(index).unwrap() {
+    pub fn get_array<'b>(&'b mut self, index: usize) -> Result<&'b mut BencodeArray<'a>, ()> {
+        match self.l.get_mut(index).unwrap() {
             BencodeVariable::ARRAY(arr) => Ok(arr),
             _ => Err(())
         }
     }
 
-    pub fn get_object(&'a self, index: usize) -> Result<&BencodeObject, ()> {
-        match self.l.get(index).unwrap() {
+    pub fn get_object<'b>(&'b mut self, index: usize) -> Result<&'b mut BencodeObject<'a>, ()> {
+        match self.l.get_mut(index).unwrap() {
             BencodeVariable::OBJECT(obj) => Ok(obj),
             _ => Err(())
         }

@@ -40,7 +40,7 @@ impl<'a> BencodeObject<'a> {
         }
     }
 
-    pub fn get_array(&'a mut self, key: &'a str) -> Result<&mut BencodeArray, ()> {
+    pub fn get_array<'b>(&'b mut self, key: &'a str) -> Result<&'b mut BencodeArray<'a>, ()> {
         let key = BencodeBytes::from(key);
 
         match self.m.get_mut(&key).unwrap() {
@@ -49,7 +49,7 @@ impl<'a> BencodeObject<'a> {
         }
     }
 
-    pub fn get_object(&'a mut self, key: &'a str) -> Result<&mut BencodeObject, ()> {
+    pub fn get_object<'b>(&'b mut self, key: &'a str) -> Result<&'b mut BencodeObject<'a>, ()> {
         let key = BencodeBytes::from(key);
 
         match self.m.get_mut(&key).unwrap() {
