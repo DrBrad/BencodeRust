@@ -1,5 +1,6 @@
 use std::str::{from_utf8, FromStr};
 use std::slice::from_raw_parts;
+use std::mem::forget;
 
 use crate::variables::inter::bencode::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
@@ -33,15 +34,16 @@ macro_rules! impl_decodable_number {
 
                 fn from(value: $type) -> Self {
                     let value = value.to_string();
+                    let size = value.len()+2;
 
                     let bytes = value.as_ptr();
                     let len = value.len();
-                    std::mem::forget(value);
+                    forget(value);
 
                     unsafe {
                         Self {
                             n: from_raw_parts(bytes, len),
-                            s: 10
+                            s: size
                         }
                     }
                 }
@@ -61,26 +63,28 @@ impl<'a> Bencode<'a> for BencodeNumber<'a> {
             panic!("Buffer is not a bencode bytes / string.");
         }
 
-            *off += 1;
+        *off += 1;
 
-        let mut c = [0 as char; 32];
-        let s = *off;
+        let mut c = [0u8; 32];
+        let mut s = *off;
 
-        while buf[*off] != Self::TYPE.suffix() as u8 {
-            c[*off - s] = buf[*off] as char;
+        while buf[*off] != Self::TYPE.suffix() {
+            c[*off - s] = buf[*off];
             *off += 1;
         }
 
         let bytes = &buf[s..*off];
 
         *off += 1;
+        s = *off+1-s;
 
         Self {
             n: bytes,
-            s: 10
+            s
         }
     }
 
+    /*
     fn to_bencode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::new();
 
@@ -88,6 +92,23 @@ impl<'a> Bencode<'a> for BencodeNumber<'a> {
         r.extend_from_slice(self.n);
         r.push(Self::TYPE.suffix());
         r
+    }
+    */
+    fn to_bencode(&self) -> &[u8] {
+        let mut data = vec![0u8; self.s];
+
+        data[0] = Self::TYPE.prefix();
+        data[1..=self.n.len()].copy_from_slice(self.n);
+        data[self.n.len() + 1] = Self::TYPE.suffix();
+
+        let ptr = data.as_ptr();
+        let len = data.len();
+
+        forget(data);
+
+        unsafe {
+            from_raw_parts(ptr, len)
+        }
     }
 
     fn byte_size(&self) -> usize {

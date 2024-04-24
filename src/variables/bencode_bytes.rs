@@ -1,5 +1,6 @@
 use std::str::from_utf8;
 use std::slice::from_raw_parts;
+use std::mem::forget;
 
 use crate::variables::inter::bencode::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
@@ -54,7 +55,7 @@ impl<'a> From<String> for BencodeBytes<'a> {
     fn from(value: String) -> Self {
         let bytes = value.as_ptr();
         let len = value.len();
-        std::mem::forget(value);
+        forget(value);
 
         unsafe {
             let value = from_raw_parts(bytes, len);
@@ -74,25 +75,27 @@ impl<'a> Bencode<'a> for BencodeBytes<'a> {
             panic!("Buffer is not a bencode bytes / string.");
         }
 
-        let mut len_bytes = [0; 8];
-        let start = *off;
+        let mut len_bytes = [0u8; 8];
+        let mut s = *off;
 
         while buf[*off] != Self::TYPE.delimiter() {
-            len_bytes[*off - start] = buf[*off];
+            len_bytes[*off - s] = buf[*off];
             *off += 1;
         }
 
-        let length = len_bytes.iter().take(*off - start).fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
+        let length = len_bytes.iter().take(*off - s).fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
         let bytes = &buf[*off + 1..*off + 1 + length];
 
         *off += 1+length;
+        s = *off-s;
 
         Self {
             b: bytes,
-            s: (*off - start)+length+1
+            s
         }
     }
 
+    /*
     fn to_bencode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::new();
 
@@ -100,6 +103,35 @@ impl<'a> Bencode<'a> for BencodeBytes<'a> {
         r.push(Self::TYPE.delimiter());
         r.extend_from_slice(&self.b);
         r
+    }
+    */
+    fn to_bencode(&self) -> &[u8] {
+        let mut data = vec![0u8; self.s];
+
+        let len_str = self.b.len().to_string();
+        let len_bytes = len_str.as_bytes();
+
+        let mut index = 0;
+        for &byte in len_bytes {
+            data[index] = byte;
+            index += 1;
+        }
+        data[index] = Self::TYPE.delimiter();
+        index += 1;
+
+        for &byte in self.b {
+            data[index] = byte;
+            index += 1;
+        }
+
+        let ptr = data.as_ptr();
+        let len = data.len();
+
+        forget(data);
+
+        unsafe {
+            from_raw_parts(ptr, len)
+        }
     }
 
     fn byte_size(&self) -> usize {

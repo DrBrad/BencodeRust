@@ -24,6 +24,8 @@ pub enum BencodeVariables<'a> {
 mod tests {
 
     use crate::variables::bencode_array::{AddArray, BencodeArray};
+    use crate::variables::bencode_bytes::BencodeBytes;
+    use crate::variables::bencode_number::BencodeNumber;
     //use crate::variables::to_bencode::Be;
     //use crate::variables::from_bencode::FromBencode;
     use crate::variables::bencode_object::{BencodeObject, PutObject};
@@ -51,6 +53,12 @@ mod tests {
         println!("{:?}", encoded);
 
         println!("{}", obj.to_string());
+
+
+        let z = encoded.to_vec();
+
+        let decoded = BencodeObject::from_bencode(&z, &mut 0);
+        println!("{}", decoded.to_string());
     }
 
     /*

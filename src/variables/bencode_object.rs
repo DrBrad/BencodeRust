@@ -1,3 +1,5 @@
+use std::mem::forget;
+use std::slice::from_raw_parts;
 use std::str::FromStr;
 use crate::utils::ordered_map::OrderedMap;
 use crate::BencodeVariables;
@@ -177,6 +179,7 @@ impl<'a> Bencode<'a> for BencodeObject<'a> {
             panic!("Buffer is not a bencode array.");
         }
 
+        let mut s = *off;
         *off += 1;
 
         let mut res = OrderedMap::<BencodeBytes, BencodeVariables>::new();//::with_hasher(Default::default());
@@ -197,14 +200,15 @@ impl<'a> Bencode<'a> for BencodeObject<'a> {
         }
 
         *off += 1;
-
+        s = *off-s;
 
         Self {
             m: res,
-            s: 10
+            s
         }
     }
 
+    /*
     fn to_bencode(&self) -> Vec<u8> {
         let mut buf: Vec<u8> = Vec::new();
         buf.push(Self::TYPE.prefix());
@@ -222,6 +226,42 @@ impl<'a> Bencode<'a> for BencodeObject<'a> {
 
         buf.push(Self::TYPE.suffix());
         buf
+    }
+    */
+    fn to_bencode(&self) -> &[u8] {
+        let mut data = vec![0u8; self.s];
+        let mut index = 0;
+
+        data[index] = Self::TYPE.prefix();
+        index += 1;
+
+        for (key, value) in self.m.iter() {
+            let key_bencode = key.to_bencode();
+            let key_len = key_bencode.len();
+            data[index..index + key_len].copy_from_slice(&key_bencode);
+            index += key_len;
+
+            let value_bencode = match value {
+                BencodeVariables::NUMBER(num) => num.to_bencode(),
+                BencodeVariables::ARRAY(arr) => arr.to_bencode(),
+                BencodeVariables::OBJECT(obj) => obj.to_bencode(),
+                BencodeVariables::BYTES(byt) => byt.to_bencode(),
+            };
+            let value_len = value_bencode.len();
+            data[index..index + value_len].copy_from_slice(&value_bencode);
+            index += value_len;
+        }
+
+        data[index] = Self::TYPE.suffix();
+
+        let ptr = data.as_ptr();
+        let len = data.len();
+
+        forget(data);
+
+        unsafe {
+            from_raw_parts(ptr, len)
+        }
     }
 
     fn byte_size(&self) -> usize {
