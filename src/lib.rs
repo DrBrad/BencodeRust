@@ -27,9 +27,19 @@ mod tests {
 
         let mut obj = BencodeObject::new();
         obj.put("object", BencodeObject::new());
+        /*
         {
             let mut m = obj.get_object("object").unwrap();
             m.put("string", "strong");
+        }
+        */
+        {
+            let key = BencodeBytes::from("object");
+
+            match obj.m.get_mut(&key).unwrap() {
+                BencodeVariable::OBJECT(obj) => obj.put("string", "strong"),
+                _ => unimplemented!()
+            }
         }
 
         println!("{}", obj.to_string());
