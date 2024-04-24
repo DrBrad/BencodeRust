@@ -5,7 +5,7 @@ use std::mem::forget;
 use crate::variables::inter::bencode_variable::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
 
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Debug, Eq, Hash, PartialEq, Clone)]
 pub struct BencodeNumber<'a>{
     n: &'a [u8],
     s: usize

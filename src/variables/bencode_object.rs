@@ -9,9 +9,9 @@ use crate::variables::bencode_number::BencodeNumber;
 use crate::variables::inter::bencode_variable::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BencodeObject<'a> {
-    m: OrderedMap<BencodeBytes, BencodeVariable<'a>>,
+    pub m: OrderedMap<BencodeBytes, BencodeVariable<'a>>,
     s: usize
 }
 

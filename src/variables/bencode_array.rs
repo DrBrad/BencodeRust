@@ -8,7 +8,7 @@ use crate::variables::bencode_object::BencodeObject;
 use crate::variables::inter::bencode_variable::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BencodeArray<'a> {
     l: Vec<BencodeVariable<'a>>,
     s: usize

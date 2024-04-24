@@ -10,15 +10,31 @@ pub mod utils;
 
 #[cfg(test)]
 mod tests {
-
+    use std::ops::DerefMut;
     use crate::variables::bencode_array::{AddArray, BencodeArray};
+    use crate::variables::bencode_bytes::BencodeBytes;
     use crate::variables::bencode_object::{BencodeObject, PutObject};
-    use crate::variables::inter::bencode_variable::Bencode;
+    use crate::variables::inter::bencode_variable::{Bencode, BencodeVariable};
 
     #[test]
     fn main() {
+        /*
+        let mut items = vec![1];
+        let item = items.last();
+        items.push(2);
+        println!("{:?}", item);
+        */
+
         let mut obj = BencodeObject::new();
-        obj.put("a", "foo");
+        obj.put("object", BencodeObject::new());
+        {
+            let mut m = obj.get_object("object").unwrap();
+            m.put("string", "strong");
+        }
+
+        println!("{}", obj.to_string());
+
+        /*
         obj.put("b", "bar");
         obj.put("c", "far");
         obj.put("n", 100);
@@ -32,10 +48,12 @@ mod tests {
         let mut obj2 = BencodeObject::new();
         obj2.put("z", "another one");
         obj.put("object", obj2);
+        */
 
-        //let z = obj.get_object("object").unwrap();
-        //z.put("hello", "world");
+        //z.deref_mut();
+        //obj.put("blank", "blonk");
 
+        /*
         let encoded = obj.encode();
         println!("{:?}", encoded);
 
@@ -43,6 +61,7 @@ mod tests {
 
         let decoded = BencodeObject::decode(encoded);
         println!("{}", decoded.to_string());
+        */
     }
 
     /*
