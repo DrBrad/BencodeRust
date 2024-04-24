@@ -6,17 +6,17 @@ use crate::variables::inter::bencode_variable::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
-pub struct BencodeBytes<'a> {
-    b: &'a [u8],
+pub struct BencodeBytes {
+    b: Vec<u8>,
     s: usize
 }//(&'a [u8]);
 
-impl<'a> BencodeBytes<'a> {
+impl BencodeBytes {
 
     const TYPE: BencodeType = BencodeType::BYTES;
 
     pub fn as_bytes(&self) -> &[u8] {
-        self.b
+        &self.b
     }
 
     pub fn as_str(&self) -> &str {
@@ -28,31 +28,38 @@ impl<'a> BencodeBytes<'a> {
     }
 }
 
-impl<'a, const N: usize> From<&'a [u8; N]> for BencodeBytes<'a> {
+impl<'a, const N: usize> From<[u8; N]> for BencodeBytes {
 
-    fn from(value: &'a [u8; N]) -> Self {
+    fn from(value: [u8; N]) -> Self {
         Self {
-            b: value,
+            b: value.to_vec(),
             s: value.len()+value.len().to_string().len()+1
         }
     }
 }
 
-impl<'a> From<&'a str> for BencodeBytes<'a> {
+impl<'a> From<&'a str> for BencodeBytes {
 
     fn from(value: &'a str) -> Self {
-        let value = value.as_bytes();
+        //let value = value.as_bytes();
 
         Self {
-            b: value,
+            b: value.as_bytes().to_vec(),
             s: value.len()+value.len().to_string().len()+1
         }
     }
 }
 
-impl<'a> From<String> for BencodeBytes<'a> {
+impl<'a> From<String> for BencodeBytes {
 
     fn from(value: String) -> Self {
+        let value = value.into_bytes();
+        let s = value.len()+value.len().to_string().len()+1;
+        Self {
+            b: value,//from_raw_parts(bytes, len),
+            s
+        }
+        /*
         let bytes = value.as_ptr();
         let len = value.len();
         forget(value);
@@ -64,11 +71,11 @@ impl<'a> From<String> for BencodeBytes<'a> {
                 b: value,//from_raw_parts(bytes, len),
                 s: value.len()+value.len().to_string().len()+1
             }
-        }
+        }*/
     }
 }
 
-impl<'a> Bencode<'a> for BencodeBytes<'a> {
+impl<'a> Bencode<'a> for BencodeBytes {
 
     fn decode_with_offset(buf: &'a [u8], off: usize) -> Self {
         if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
@@ -91,7 +98,7 @@ impl<'a> Bencode<'a> for BencodeBytes<'a> {
         s = off-s;
 
         Self {
-            b: bytes,
+            b: bytes.to_vec(),
             s
         }
     }
@@ -120,7 +127,7 @@ impl<'a> Bencode<'a> for BencodeBytes<'a> {
         data[index] = Self::TYPE.delimiter();
         index += 1;
 
-        for &byte in self.b {
+        for &byte in self.b.iter() {
             data[index] = byte;
             index += 1;
         }

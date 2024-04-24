@@ -95,9 +95,9 @@ impl<'a> From<Vec<BencodeVariable<'a>>> for BencodeArray<'a> {
     }
 }
 
-impl<'a, const N: usize> AddArray<'a, &'a [u8; N]> for BencodeArray<'a> {
+impl<'a, const N: usize> AddArray<'a, [u8; N]> for BencodeArray<'a> {
 
-    fn add(&mut self, value: &'a [u8; N]) {
+    fn add(&mut self, value: [u8; N]) {
         let value = BencodeBytes::from(value);
         self.s += value.byte_size();
         self.l.push(BencodeVariable::BYTES(value));

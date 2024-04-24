@@ -8,7 +8,7 @@ pub enum BencodeVariable<'a> {
     NUMBER(BencodeNumber<'a>),
     ARRAY(BencodeArray<'a>),
     OBJECT(BencodeObject<'a>),
-    BYTES(BencodeBytes<'a>)
+    BYTES(BencodeBytes)
 }
 
 pub trait Bencode<'a> {

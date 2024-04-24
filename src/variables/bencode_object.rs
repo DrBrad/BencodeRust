@@ -11,7 +11,7 @@ use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug)]
 pub struct BencodeObject<'a> {
-    m: OrderedMap<BencodeBytes<'a>, BencodeVariable<'a>>,
+    m: OrderedMap<BencodeBytes, BencodeVariable<'a>>,
     s: usize
 }
 
@@ -94,9 +94,9 @@ impl<'a> BencodeObject<'a> {
     }
 }
 
-impl<'a> From<OrderedMap<BencodeBytes<'a>, BencodeVariable<'a>>> for BencodeObject<'a> {
+impl<'a> From<OrderedMap<BencodeBytes, BencodeVariable<'a>>> for BencodeObject<'a> {
 
-    fn from(value: OrderedMap<BencodeBytes<'a>, BencodeVariable<'a>>) -> Self {
+    fn from(value: OrderedMap<BencodeBytes, BencodeVariable<'a>>) -> Self {
         //WE NEED TO COUNT THE SIZE...
 
         Self {
@@ -106,9 +106,9 @@ impl<'a> From<OrderedMap<BencodeBytes<'a>, BencodeVariable<'a>>> for BencodeObje
     }
 }
 
-impl<'a, const N: usize> PutObject<'a, &'a [u8; N]> for BencodeObject<'a> {
+impl<'a, const N: usize> PutObject<'a, [u8; N]> for BencodeObject<'a> {
 
-    fn put(&mut self, key: &'a str, value: &'a [u8; N]) {
+    fn put(&mut self, key: &'a str, value: [u8; N]) {
         let key = BencodeBytes::from(key);
         let value = BencodeBytes::from(value);
         self.s += key.byte_size()+value.byte_size();
