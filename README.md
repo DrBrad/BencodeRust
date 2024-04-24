@@ -34,10 +34,10 @@ fn main() {
     original.put("a", "foo");
     original.put("b", "bar");
     original.put("c", 456.78);
-    let encoded = original.to_bencode();
+    let encoded = original.encode();
     println!("{:?}", encoded);
 
-    let decoded = BencodeObject::from_bencode(&encoded, &mut 0);
+    let decoded = BencodeObject::decode(encoded, &mut 0);
     println!("{}", decoded.to_string());
 }
 ```
