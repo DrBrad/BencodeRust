@@ -1,8 +1,3 @@
-use crate::variables::bencode_array::BencodeArray;
-use crate::variables::bencode_bytes::BencodeBytes;
-use crate::variables::bencode_number::BencodeNumber;
-use crate::variables::bencode_object::BencodeObject;
-
 pub mod variables;
 pub mod utils;
 
@@ -12,20 +7,14 @@ pub mod utils;
 //- oberserver and mutable get IE get_mut
 
 
-#[derive(Debug)]
-pub enum BencodeVariables<'a> {
-    NUMBER(BencodeNumber<'a>),
-    ARRAY(BencodeArray<'a>),
-    OBJECT(BencodeObject<'a>),
-    BYTES(BencodeBytes<'a>)
-}
+
 
 #[cfg(test)]
 mod tests {
 
     use crate::variables::bencode_array::{AddArray, BencodeArray};
     use crate::variables::bencode_object::{BencodeObject, PutObject};
-    use crate::variables::inter::bencode::Bencode;
+    use crate::variables::inter::bencode_variable::Bencode;
 
     #[test]
     fn main() {

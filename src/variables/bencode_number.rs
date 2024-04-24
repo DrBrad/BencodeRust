@@ -2,7 +2,7 @@ use std::str::{from_utf8, FromStr};
 use std::slice::from_raw_parts;
 use std::mem::forget;
 
-use crate::variables::inter::bencode::Bencode;
+use crate::variables::inter::bencode_variable::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Eq, Hash, PartialEq)]
