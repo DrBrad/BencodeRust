@@ -36,13 +36,13 @@ mod tests {
         //let z = obj.get_object("object").unwrap();
         //z.put("hello", "world");
 
-        //let encoded = obj.encode();
-        //println!("{:?}", encoded);
+        let encoded = obj.encode();
+        println!("{:?}", encoded);
 
         println!("{}", obj.to_string());
 
-        //let decoded = BencodeObject::decode(encoded);
-        //println!("{}", decoded.to_string());
+        let decoded = BencodeObject::decode(encoded);
+        println!("{}", decoded.to_string());
     }
 
     /*
