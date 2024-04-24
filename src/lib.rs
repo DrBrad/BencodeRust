@@ -10,6 +10,7 @@ pub mod utils;
 //- add remove option
 //- add if contains option
 //- oberserver and mutable get IE get_mut
+//- do decode without using *off...
 
 
 #[derive(Debug)]
