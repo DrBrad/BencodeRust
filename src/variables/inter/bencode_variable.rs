@@ -5,10 +5,10 @@ use crate::variables::bencode_object::BencodeObject;
 
 #[derive(Debug, Clone)]
 pub enum BencodeVariable<'a> {
-    NUMBER(BencodeNumber<'a>),
-    ARRAY(BencodeArray<'a>),
-    OBJECT(BencodeObject<'a>),
-    BYTES(BencodeBytes)
+    Number(BencodeNumber<'a>),
+    Array(BencodeArray<'a>),
+    Object(BencodeObject<'a>),
+    Bytes(BencodeBytes)
 }
 
 pub trait Bencode<'a> {

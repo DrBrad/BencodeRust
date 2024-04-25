@@ -13,7 +13,7 @@ pub struct BencodeNumber<'a>{
 
 impl<'a> BencodeNumber<'a> {
 
-    const TYPE: BencodeType = BencodeType::NUMBER;
+    const TYPE: BencodeType = BencodeType::Number;
 
     pub fn parse<V>(&self) -> V where V: FromStr {
         let str = from_utf8(&self.n).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));

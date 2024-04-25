@@ -13,7 +13,7 @@ pub struct BencodeBytes {
 
 impl BencodeBytes {
 
-    const TYPE: BencodeType = BencodeType::BYTES;
+    const TYPE: BencodeType = BencodeType::Bytes;
 
     pub fn as_bytes(&self) -> &[u8] {
         &self.b
