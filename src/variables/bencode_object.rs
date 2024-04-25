@@ -34,6 +34,18 @@ impl<'a> BencodeObject<'a> {
         self.m.contains_key(&BencodeBytes::from(key))
     }
 
+    pub fn remove(&mut self, key: &'a str) {
+        let key = BencodeBytes::from(key);
+        let s = match self.m.get(&key).unwrap() {
+            BencodeVariable::Number(num) => num.byte_size(),
+            BencodeVariable::Array(arr) => arr.byte_size(),
+            BencodeVariable::Object(obj) => obj.byte_size(),
+            BencodeVariable::Bytes(byt) => byt.byte_size(),
+        };
+        self.s -= key.byte_size()+s;
+        self.m.remove(&key);
+    }
+
     pub fn get_number<V>(&self, key: &'a str) -> Result<V, ()> where V: FromStr {
         let key = BencodeBytes::from(key);
 
@@ -204,7 +216,7 @@ macro_rules! impl_object_number {
     }
 }
 
-impl_object_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
+impl_object_number!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 isize f32 f64);
 
 impl<'a> Bencode<'a> for BencodeObject<'a> {
 

@@ -29,6 +29,15 @@ impl<K, V> OrderedMap<K, V> where K: Eq + Hash + Clone {
         self.map.contains_key(key)
     }
 
+    pub fn remove(&mut self, key: &K) -> Option<V> {
+        if let Some(value) = self.map.remove(key) {
+            self.keys.retain(|k| k != key);
+            Some(value)
+        } else {
+            None
+        }
+    }
+
     pub fn get(&self, key: &K) -> Option<&V> {
         self.map.get(key)
     }

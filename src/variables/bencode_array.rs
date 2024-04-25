@@ -32,6 +32,10 @@ impl<'a> BencodeArray<'a> {
         self.l.contains(var)
     }
 
+    pub fn remove(&mut self, index: usize) {
+        self.l.remove(index);
+    }
+
     pub fn get_number<V>(&self, index: usize) -> Result<V, ()> where V: FromStr {
         match self.l.get(index).unwrap() {
             BencodeVariable::Number(num) => num.parse::<V>(),
@@ -169,7 +173,7 @@ macro_rules! impl_array_number {
     }
 }
 
-impl_array_number!(u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize f32 f64);
+impl_array_number!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 isize f32 f64);
 
 impl<'a> Bencode<'a> for BencodeArray<'a> {
 

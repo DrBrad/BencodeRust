@@ -2,9 +2,8 @@ pub mod variables;
 pub mod utils;
 
 //TODO
-//- add remove option
 //- oberserver to update size of arrays from child to parent
-//- add i/o iption
+//- add i/o option
 
 #[cfg(test)]
 mod tests {
