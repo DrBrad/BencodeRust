@@ -33,6 +33,13 @@ impl<'a> BencodeArray<'a> {
     }
 
     pub fn remove(&mut self, index: usize) {
+        let s = match self.l.get(index).unwrap() {
+            BencodeVariable::Number(num) => num.byte_size(),
+            BencodeVariable::Array(arr) => arr.byte_size(),
+            BencodeVariable::Object(obj) => obj.byte_size(),
+            BencodeVariable::Bytes(byt) => byt.byte_size(),
+        };
+        self.s -= s;
         self.l.remove(index);
     }
 
