@@ -4,9 +4,8 @@ pub mod utils;
 //TODO
 //- add remove option
 //- add if contains option
-//- oberserver and mutable get IE get_mut
+//- oberserver to update size of arrays from child to parent
 //- add i/o iption
-//- error handling - Result for parsing num and bencode bytes - as_str
 
 #[cfg(test)]
 mod tests {
