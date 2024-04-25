@@ -6,13 +6,15 @@ use crate::variables::inter::bencode_variable::BencodeVariable;
 use crate::variables::bencode_array::BencodeArray;
 use crate::variables::bencode_bytes::BencodeBytes;
 use crate::variables::bencode_number::BencodeNumber;
+use crate::variables::inter::bencode_observer::BencodeObserver;
 use crate::variables::inter::bencode_variable::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Clone)]
 pub struct BencodeObject<'a> {
     pub m: OrderedMap<BencodeBytes, BencodeVariable<'a>>,
-    s: usize
+    s: usize,
+    //o: BencodeObserver
 }
 
 pub trait PutObject<'a, V> {
@@ -91,6 +93,17 @@ impl<'a> BencodeObject<'a> {
 
         res.push_str("}");
         res
+    }
+}
+
+//REF FROM PARENT FOR OBSERVING UPDATES TO SIZE...
+impl<'a> From<BencodeObject<'a>> for BencodeObject<'a> {
+
+    fn from(value: BencodeObject<'a>) -> Self {
+        Self {
+            m: OrderedMap::<BencodeBytes, BencodeVariable>::new(),
+            s: 2
+        }
     }
 }
 

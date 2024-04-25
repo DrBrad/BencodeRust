@@ -13,6 +13,7 @@ mod tests {
 
     use crate::variables::bencode_array::{AddArray, BencodeArray};
     use crate::variables::bencode_object::{BencodeObject, PutObject};
+    use crate::variables::inter::bencode_variable::Bencode;
 
     #[test]
     fn main() {
@@ -38,7 +39,6 @@ mod tests {
         //z.deref_mut();
         //obj.put("blank", "blonk");
 
-        /*
         let encoded = obj.encode();
         println!("{:?}", encoded);
 
@@ -46,7 +46,6 @@ mod tests {
 
         let decoded = BencodeObject::decode(encoded);
         println!("{}", decoded.to_string());
-        */
     }
 
     /*
