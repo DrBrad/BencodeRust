@@ -3,7 +3,6 @@ pub mod utils;
 
 //TODO
 //- add remove option
-//- add if contains option
 //- oberserver to update size of arrays from child to parent
 //- add i/o iption
 

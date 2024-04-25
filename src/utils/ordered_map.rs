@@ -1,12 +1,13 @@
 use std::collections::HashMap;
+use std::hash::Hash;
 
-#[derive(Debug, Clone)]
-pub struct OrderedMap<K, V> {
+#[derive(Debug, Clone, PartialEq)]
+pub struct OrderedMap<K: Eq + Hash, V> {
     map: HashMap<K, V>,
     keys: Vec<K>,
 }
 
-impl<K, V> OrderedMap<K, V> where K: Eq + std::hash::Hash + Clone {
+impl<K, V> OrderedMap<K, V> where K: Eq + Hash + Clone {
 
     pub fn new() -> Self {
         OrderedMap {
@@ -22,6 +23,10 @@ impl<K, V> OrderedMap<K, V> where K: Eq + std::hash::Hash + Clone {
             self.keys.push(key.clone());
             self.map.insert(key, value)
         }
+    }
+
+    pub fn contains_key(&self, key: &K) -> bool {
+        self.map.contains_key(key)
     }
 
     pub fn get(&self, key: &K) -> Option<&V> {

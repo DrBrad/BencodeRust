@@ -7,7 +7,7 @@ use crate::variables::bencode_number::BencodeNumber;
 use crate::variables::inter::bencode_variable::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct BencodeObject<'a> {
     m: OrderedMap<BencodeBytes, BencodeVariable<'a>>,
     s: usize,
@@ -28,6 +28,10 @@ impl<'a> BencodeObject<'a> {
             m: OrderedMap::<BencodeBytes, BencodeVariable>::new(),
             s: 2
         }
+    }
+
+    pub fn contains_key(&self, key: &'a str) -> bool {
+        self.m.contains_key(&BencodeBytes::from(key))
     }
 
     pub fn get_number<V>(&self, key: &'a str) -> Result<V, ()> where V: FromStr {

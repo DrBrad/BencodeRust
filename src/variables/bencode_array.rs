@@ -6,7 +6,7 @@ use crate::variables::bencode_object::BencodeObject;
 use crate::variables::inter::bencode_variable::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct BencodeArray<'a> {
     l: Vec<BencodeVariable<'a>>,
     s: usize
@@ -26,6 +26,10 @@ impl<'a> BencodeArray<'a> {
             l: Vec::new(),
             s: 2
         }
+    }
+
+    pub fn contains(&self, var: &'a BencodeVariable<'a>) -> bool {
+        self.l.contains(var)
     }
 
     pub fn get_number<V>(&self, index: usize) -> Result<V, ()> where V: FromStr {

@@ -3,7 +3,7 @@ use crate::variables::bencode_bytes::BencodeBytes;
 use crate::variables::bencode_number::BencodeNumber;
 use crate::variables::bencode_object::BencodeObject;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum BencodeVariable<'a> {
     Number(BencodeNumber<'a>),
     Array(BencodeArray<'a>),
