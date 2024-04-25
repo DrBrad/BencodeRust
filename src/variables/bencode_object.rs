@@ -97,6 +97,7 @@ impl<'a> BencodeObject<'a> {
 }
 
 //REF FROM PARENT FOR OBSERVING UPDATES TO SIZE...
+/*
 impl<'a> From<BencodeObject<'a>> for BencodeObject<'a> {
 
     fn from(value: BencodeObject<'a>) -> Self {
@@ -106,6 +107,7 @@ impl<'a> From<BencodeObject<'a>> for BencodeObject<'a> {
         }
     }
 }
+*/
 
 impl<'a> From<OrderedMap<BencodeBytes, BencodeVariable<'a>>> for BencodeObject<'a> {
 
