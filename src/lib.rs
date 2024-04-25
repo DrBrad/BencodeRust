@@ -29,7 +29,7 @@ mod tests {
         let mut obj2 = BencodeObject::new();
         obj2.put("z", "another one");
         obj.put("object", obj2);
-        obj.get_object("object").unwrap().put("n", "mutate");
+        obj.get_object_mut("object").unwrap().put("n", "mutate");
 
         //z.deref_mut();
         //obj.put("blank", "blonk");

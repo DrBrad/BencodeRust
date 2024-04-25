@@ -39,14 +39,28 @@ impl<'a> BencodeArray<'a> {
         }
     }
 
-    pub fn get_array(&mut self, index: usize) -> Result<&mut BencodeArray<'a>, ()> {
+    pub fn get_array(&self, index: usize) -> Result<&BencodeArray<'a>, ()> {
+        match self.l.get(index).unwrap() {
+            BencodeVariable::Array(arr) => Ok(arr),
+            _ => Err(())
+        }
+    }
+
+    pub fn get_array_mut(&mut self, index: usize) -> Result<&mut BencodeArray<'a>, ()> {
         match self.l.get_mut(index).unwrap() {
             BencodeVariable::Array(arr) => Ok(arr),
             _ => Err(())
         }
     }
 
-    pub fn get_object(&mut self, index: usize) -> Result<&mut BencodeObject<'a>, ()> {
+    pub fn get_object(&self, index: usize) -> Result<&BencodeObject<'a>, ()> {
+        match self.l.get(index).unwrap() {
+            BencodeVariable::Object(obj) => Ok(obj),
+            _ => Err(())
+        }
+    }
+
+    pub fn get_object_mut(&mut self, index: usize) -> Result<&mut BencodeObject<'a>, ()> {
         match self.l.get_mut(index).unwrap() {
             BencodeVariable::Object(obj) => Ok(obj),
             _ => Err(())
