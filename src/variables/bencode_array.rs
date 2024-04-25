@@ -8,7 +8,7 @@ use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Clone)]
 pub struct BencodeArray<'a> {
-    pub l: Vec<BencodeVariable<'a>>,
+    l: Vec<BencodeVariable<'a>>,
     s: usize
 }
 

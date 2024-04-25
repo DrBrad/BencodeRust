@@ -9,7 +9,7 @@ use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Clone)]
 pub struct BencodeObject<'a> {
-    pub m: OrderedMap<BencodeBytes, BencodeVariable<'a>>,
+    m: OrderedMap<BencodeBytes, BencodeVariable<'a>>,
     s: usize,
     //o: BencodeObserver
 }
