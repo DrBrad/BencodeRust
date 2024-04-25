@@ -44,7 +44,7 @@ mod tests {
 
         println!("{}", obj.to_string());
 
-        let decoded = BencodeObject::decode(encoded);
+        let decoded = BencodeObject::decode(&encoded);
         println!("{}", decoded.to_string());
     }
 

@@ -1,6 +1,4 @@
 use std::str::from_utf8;
-use std::slice::from_raw_parts;
-use std::mem::forget;
 
 use crate::variables::inter::bencode_variable::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
@@ -103,16 +101,15 @@ impl<'a> Bencode<'a> for BencodeBytes {
         }
     }
 
-    /*
-    fn to_bencode(&self) -> Vec<u8> {
-        let mut r: Vec<u8> = Vec::new();
+    fn encode(&self) -> Vec<u8> {
+        let mut r: Vec<u8> = Vec::with_capacity(self.s);
 
         r.extend_from_slice(self.b.len().to_string().as_bytes());
         r.push(Self::TYPE.delimiter());
         r.extend_from_slice(&self.b);
         r
     }
-    */
+    /*
     fn encode(&self) -> &[u8] {
         let mut data = vec![0u8; self.s];
 
@@ -141,6 +138,7 @@ impl<'a> Bencode<'a> for BencodeBytes {
             from_raw_parts(ptr, len)
         }
     }
+    */
 
     fn byte_size(&self) -> usize {
         self.s

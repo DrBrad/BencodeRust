@@ -80,16 +80,15 @@ impl<'a> Bencode<'a> for BencodeNumber<'a> {
         }
     }
 
-    /*
-    fn to_bencode(&self) -> Vec<u8> {
-        let mut r: Vec<u8> = Vec::new();
+    fn encode(&self) -> Vec<u8> {
+        let mut r: Vec<u8> = Vec::with_capacity(self.s);
 
         r.push(Self::TYPE.prefix());
         r.extend_from_slice(self.n);
         r.push(Self::TYPE.suffix());
         r
     }
-    */
+    /*
     fn encode(&self) -> &[u8] {
         let mut data = vec![0u8; self.s];
 
@@ -106,6 +105,7 @@ impl<'a> Bencode<'a> for BencodeNumber<'a> {
             from_raw_parts(ptr, len)
         }
     }
+    */
 
     fn byte_size(&self) -> usize {
         self.s

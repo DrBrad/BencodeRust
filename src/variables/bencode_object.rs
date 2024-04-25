@@ -1,5 +1,3 @@
-use std::mem::forget;
-use std::slice::from_raw_parts;
 use std::str::FromStr;
 use crate::utils::ordered_map::OrderedMap;
 use crate::variables::inter::bencode_variable::BencodeVariable;
@@ -239,18 +237,17 @@ impl<'a> Bencode<'a> for BencodeObject<'a> {
         }
     }
 
-    /*
-    fn to_bencode(&self) -> Vec<u8> {
-        let mut buf: Vec<u8> = Vec::new();
+    fn encode(&self) -> Vec<u8> {
+        let mut buf: Vec<u8> = Vec::with_capacity(self.s);
         buf.push(Self::TYPE.prefix());
 
         for (key, value) in self.m.iter() {
-            buf.extend_from_slice(&key.to_bencode());
+            buf.extend_from_slice(&key.encode());
             let value = match value {
-                BencodeVariables::NUMBER(num) => num.to_bencode(),
-                BencodeVariables::ARRAY(arr) => arr.to_bencode(),
-                BencodeVariables::OBJECT(obj) => obj.to_bencode(),
-                BencodeVariables::BYTES(byt) => byt.to_bencode()
+                BencodeVariable::Number(num) => num.encode(),
+                BencodeVariable::Array(arr) => arr.encode(),
+                BencodeVariable::Object(obj) => obj.encode(),
+                BencodeVariable::Bytes(byt) => byt.encode()
             };
             buf.extend_from_slice(&value);
         }
@@ -258,7 +255,7 @@ impl<'a> Bencode<'a> for BencodeObject<'a> {
         buf.push(Self::TYPE.suffix());
         buf
     }
-    */
+    /*
     fn encode(&self) -> &[u8] {
         let mut data = vec![0u8; self.s];
         let mut index = 0;
@@ -294,6 +291,7 @@ impl<'a> Bencode<'a> for BencodeObject<'a> {
             from_raw_parts(ptr, len)
         }
     }
+    */
 
     fn byte_size(&self) -> usize {
         self.s
