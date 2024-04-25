@@ -17,8 +17,8 @@ impl BencodeBytes {
         &self.b
     }
 
-    pub fn as_str(&self) -> &str {
-        from_utf8(&self.b).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"))
+    pub fn as_str(&self) -> Result<&str, ()> {
+        from_utf8(&self.b).map_err(|_| ())
     }
 
     pub fn to_string(&self) -> String {

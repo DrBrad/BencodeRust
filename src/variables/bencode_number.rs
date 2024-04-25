@@ -15,9 +15,9 @@ impl<'a> BencodeNumber<'a> {
 
     const TYPE: BencodeType = BencodeType::Number;
 
-    pub fn parse<V>(&self) -> V where V: FromStr {
-        let str = from_utf8(&self.n).unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
-        str.parse::<V>().unwrap_or_else(|_| panic!("Failed to parse to Number"))
+    pub fn parse<V>(&self) -> Result<V, ()> where V: FromStr {
+        let str = from_utf8(&self.n).map_err(|_| ());//..unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
+        str?.parse::<V>().map_err(|_| ())//.unwrap_or_else(|_| panic!("Failed to parse to Number"))
     }
 
     pub fn to_string(&self) -> String {

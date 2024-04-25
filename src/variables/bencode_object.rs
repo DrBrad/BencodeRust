@@ -34,7 +34,7 @@ impl<'a> BencodeObject<'a> {
         let key = BencodeBytes::from(key);
 
         match self.m.get(&key).unwrap() {
-            BencodeVariable::Number(num) => Ok(num.parse::<V>()),
+            BencodeVariable::Number(num) => num.parse::<V>(),
             _ => Err(())
         }
     }
@@ -70,7 +70,7 @@ impl<'a> BencodeObject<'a> {
         let key = BencodeBytes::from(key);
 
         match self.m.get(&key).unwrap() {
-            BencodeVariable::Bytes(bytes) => Ok(bytes.as_str()),
+            BencodeVariable::Bytes(bytes) => bytes.as_str(),
             _ => Err(())
         }
     }

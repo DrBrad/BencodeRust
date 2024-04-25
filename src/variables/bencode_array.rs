@@ -30,7 +30,7 @@ impl<'a> BencodeArray<'a> {
 
     pub fn get_number<V>(&self, index: usize) -> Result<V, ()> where V: FromStr {
         match self.l.get(index).unwrap() {
-            BencodeVariable::Number(num) => Ok(num.parse::<V>()),
+            BencodeVariable::Number(num) => num.parse::<V>(),
             _ => Err(())
         }
     }
@@ -58,7 +58,7 @@ impl<'a> BencodeArray<'a> {
 
     pub fn get_string(&self, index: usize) -> Result<&str, ()> {
         match self.l.get(index).unwrap() {
-            BencodeVariable::Bytes(bytes) => Ok(bytes.as_str()),
+            BencodeVariable::Bytes(bytes) => bytes.as_str(),
             _ => Err(())
         }
     }
