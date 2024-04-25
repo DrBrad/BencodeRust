@@ -31,9 +31,6 @@ mod tests {
         obj.put("object", obj2);
         obj.get_object("object").unwrap().put("n", "mutate");
 
-
-        println!("{}", obj.to_string());
-
         //z.deref_mut();
         //obj.put("blank", "blonk");
 
