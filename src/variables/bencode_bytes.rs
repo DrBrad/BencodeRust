@@ -1,3 +1,4 @@
+use std::any::Any;
 use std::str::from_utf8;
 
 use crate::variables::inter::bencode_variable::Bencode;
@@ -26,7 +27,7 @@ impl BencodeBytes {
     }
 }
 
-impl<'a, const N: usize> From<[u8; N]> for BencodeBytes {
+impl<const N: usize> From<[u8; N]> for BencodeBytes {
 
     fn from(value: [u8; N]) -> Self {
         Self {
@@ -36,7 +37,7 @@ impl<'a, const N: usize> From<[u8; N]> for BencodeBytes {
     }
 }
 
-impl<'a> From<Vec<u8>> for BencodeBytes {
+impl From<Vec<u8>> for BencodeBytes {
 
     fn from(value: Vec<u8>) -> Self {
         let l = value.len();
@@ -47,9 +48,9 @@ impl<'a> From<Vec<u8>> for BencodeBytes {
     }
 }
 
-impl<'a> From<&'a str> for BencodeBytes {
+impl From<&str> for BencodeBytes {
 
-    fn from(value: &'a str) -> Self {
+    fn from(value: &str) -> Self {
         //let value = value.as_bytes();
 
         Self {
@@ -59,7 +60,7 @@ impl<'a> From<&'a str> for BencodeBytes {
     }
 }
 
-impl<'a> From<String> for BencodeBytes {
+impl From<String> for BencodeBytes {
 
     fn from(value: String) -> Self {
         let value = value.into_bytes();
@@ -84,9 +85,10 @@ impl<'a> From<String> for BencodeBytes {
     }
 }
 
-impl<'a> Bencode<'a> for BencodeBytes {
+impl Bencode for BencodeBytes {
 
-    fn decode_with_offset(buf: &'a [u8], off: usize) -> Self {
+    /*
+    fn decode_with_offset(buf: &[u8], off: usize) -> Self {
         if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
             panic!("Buffer is not a bencode bytes / string.");
         }
@@ -111,6 +113,7 @@ impl<'a> Bencode<'a> for BencodeBytes {
             s
         }
     }
+    */
 
     fn encode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::with_capacity(self.s);
@@ -119,6 +122,32 @@ impl<'a> Bencode<'a> for BencodeBytes {
         r.push(Self::TYPE.delimiter());
         r.extend_from_slice(&self.b);
         r
+    }
+
+    fn decode_with_offset(buf: &[u8], off: usize) -> Self where Self: Sized {
+        if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
+            panic!("Buffer is not a bencode bytes / string.");
+        }
+
+        let mut off = off;
+        let mut len_bytes = [0u8; 8];
+        let mut s = off;
+
+        while buf[off] != Self::TYPE.delimiter() {
+            len_bytes[off - s] = buf[off];
+            off += 1;
+        }
+
+        let length = len_bytes.iter().take(off - s).fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
+        let bytes = buf[off + 1..off + 1 + length].to_vec();
+
+        off += 1+length;
+        s = off-s;
+
+        Self {
+            b: bytes,
+            s
+        }
     }
     /*
     fn encode(&self) -> &[u8] {
@@ -150,6 +179,9 @@ impl<'a> Bencode<'a> for BencodeBytes {
         }
     }
     */
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
 
     fn byte_size(&self) -> usize {
         self.s

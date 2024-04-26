@@ -14,6 +14,20 @@ mod tests {
 
     #[test]
     fn main() {
+
+        let mut obj = BencodeObject::new();
+        obj.put("b", "bar");
+
+        println!("{:?}", obj.get_string("b").unwrap());
+
+        let encoded = obj.encode();
+        println!("{:?}", encoded);
+
+        let decoded = BencodeObject::decode(encoded.as_slice());
+        println!("{}", decoded.get_string("b").unwrap());
+
+
+        /*
         let mut obj = BencodeObject::new();
         obj.put("b", "bar");
         obj.put("c", "far");
@@ -42,6 +56,7 @@ mod tests {
 
         let decoded = BencodeObject::decode(&encoded);
         println!("{}", decoded.to_string());
+        */
     }
 
     /*

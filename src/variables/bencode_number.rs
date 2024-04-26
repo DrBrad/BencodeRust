@@ -1,3 +1,4 @@
+use std::any::Any;
 use std::str::{from_utf8, FromStr};
 use std::slice::from_raw_parts;
 use std::mem::forget;
@@ -6,7 +7,7 @@ use crate::variables::inter::bencode_variable::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
-pub struct BencodeNumber<'a>{
+pub struct BencodeNumber<'a> {
     n: &'a [u8],
     s: usize
 }
@@ -52,6 +53,60 @@ macro_rules! impl_decodable_number {
 
 impl_decodable_number!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 isize f32 f64);
 
+/*
+impl<'a> Bencode for BencodeNumber<'a> {
+
+    fn encode(&self) -> Vec<u8> {
+        let mut r: Vec<u8> = Vec::with_capacity(self.s);
+
+        r.push(Self::TYPE.prefix());
+        r.extend_from_slice(self.n);
+        r.push(Self::TYPE.suffix());
+        r
+    }
+
+    fn decode_with_offset(buf: &[u8], off: usize) -> Self where Self: Sized {
+        /.*
+        if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
+            panic!("Buffer is not a bencode bytes / string.");
+        }
+
+        let mut off = off+1;
+
+        let mut c = [0u8; 32];
+        let mut s = off;
+
+        while buf[off] != Self::TYPE.suffix() {
+            c[off - s] = buf[off];
+            off += 1;
+        }
+
+        let bytes = &buf[s..off];
+
+        off += 1;
+        s = off+1-s;
+
+        Self {
+            n: bytes,
+            s
+        }
+        *./
+        Self {
+            n: &[0u8],
+            s: 1
+        }
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn byte_size(&self) -> usize {
+        self.s
+    }
+}
+*/
+/*
 impl<'a> Bencode<'a> for BencodeNumber<'a> {
 
     fn decode_with_offset(buf: &'a [u8], off: usize) -> Self {
@@ -88,7 +143,7 @@ impl<'a> Bencode<'a> for BencodeNumber<'a> {
         r.push(Self::TYPE.suffix());
         r
     }
-    /*
+    /.*
     fn encode(&self) -> &[u8] {
         let mut data = vec![0u8; self.s];
 
@@ -105,9 +160,13 @@ impl<'a> Bencode<'a> for BencodeNumber<'a> {
             from_raw_parts(ptr, len)
         }
     }
-    */
+    *./
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
 
     fn byte_size(&self) -> usize {
         self.s
     }
 }
+*/
