@@ -131,6 +131,15 @@ impl<'a, const N: usize> AddArray<'a, [u8; N]> for BencodeArray<'a> {
     }
 }
 
+impl<'a> AddArray<'a, Vec<u8>> for BencodeArray<'a> {
+
+    fn add(&mut self, value: Vec<u8>) {
+        let value = BencodeBytes::from(value);
+        self.s += value.byte_size();
+        self.l.push(BencodeVariable::Bytes(value));
+    }
+}
+
 impl<'a> AddArray<'a, &'a str> for BencodeArray<'a> {
 
     fn add(&mut self, value: &'a str) {

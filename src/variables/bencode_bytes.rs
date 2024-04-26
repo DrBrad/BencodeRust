@@ -36,6 +36,17 @@ impl<'a, const N: usize> From<[u8; N]> for BencodeBytes {
     }
 }
 
+impl<'a> From<Vec<u8>> for BencodeBytes {
+
+    fn from(value: Vec<u8>) -> Self {
+        let l = value.len();
+        Self {
+            b: value,
+            s: l+l.to_string().len()+1
+        }
+    }
+}
+
 impl<'a> From<&'a str> for BencodeBytes {
 
     fn from(value: &'a str) -> Self {

@@ -162,6 +162,16 @@ impl<'a, const N: usize> PutObject<'a, [u8; N]> for BencodeObject<'a> {
     }
 }
 
+impl<'a> PutObject<'a, Vec<u8>> for BencodeObject<'a> {
+
+    fn put(&mut self, key: &'a str, value: Vec<u8>) {
+        let key = BencodeBytes::from(key);
+        let value = BencodeBytes::from(value);
+        self.s += key.byte_size()+value.byte_size();
+        self.m.insert(key, BencodeVariable::Bytes(value));
+    }
+}
+
 impl<'a> PutObject<'a, &'a str> for BencodeObject<'a> {
 
     fn put(&mut self, key: &'a str, value: &'a str) {
