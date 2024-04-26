@@ -28,6 +28,8 @@ mod tests {
         println!("{}", decoded.get_string("b").unwrap());
         println!("{}", decoded.get_number::<f32>("t").unwrap());
 
+        println!("{}", decoded.to_string());
+
         /*
         let mut obj = BencodeObject::new();
         obj.put("b", "bar");

@@ -93,6 +93,15 @@ impl BencodeObject {
         let mut res = "{\r\n".to_string();
 
         for key in self.m.keys() {
+            if let Ok(num) = self.m.get(&key).unwrap().downcast::<BencodeNumber>() {
+                res.push_str(format!("\t\x1b[31m{:?}\x1b[0m: \x1b[33m{}\x1b[0m\r\n", &key.to_string(), num.to_string()));
+
+            } else if let Ok(byt) = self.m.get(&key).unwrap().downcast::<BencodeBytes>() {
+                res.push_str(format!("\t\x1b[31m{:?}\x1b[0m: \x1b[34m{:?}\x1b[0m\r\n", &key.to_string(), byt.to_string()));
+
+            }
+
+
             /*
             let value = match self.m.get(&key).unwrap() {
                 BencodeVariable::Number(num) => format!("\t\x1b[31m{:?}\x1b[0m: \x1b[33m{}\x1b[0m\r\n", &key.to_string(), num.to_string()),
@@ -160,14 +169,14 @@ impl PutObject<String> for BencodeObject {
         self.m.insert(BencodeBytes::from(key), Box::new(BencodeBytes::from(value)));
     }
 }
-/*
+
 impl PutObject<BencodeArray> for BencodeObject {
 
     fn put(&mut self, key: &str, value: BencodeArray) {
         self.m.insert(BencodeBytes::from(key), Box::new(value));
     }
 }
-*/
+
 impl PutObject<BencodeObject> for BencodeObject {
 
     fn put(&mut self, key: &str, value: BencodeObject) {
@@ -226,10 +235,9 @@ impl Bencode for BencodeObject {
                     Box::new(value) as Box<dyn Bencode>
                 },
                 BencodeType::Array => {
-                    //let value = BencodeArray::decode_with_offset(buf, off);
-                    //off += value.byte_size();
-                    //BencodeVariable::Array(value)
-                    unimplemented!()
+                    let value = BencodeArray::decode_with_offset(buf, off);
+                    off += value.byte_size();
+                    Box::new(value) as Box<dyn Bencode>
                 },
                 BencodeType::Object => {
                     let value = BencodeObject::decode_with_offset(buf, off);
