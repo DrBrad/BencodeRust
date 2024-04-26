@@ -8,8 +8,7 @@ use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct BencodeArray<'a> {
-    l: Vec<BencodeVariable<'a>>,
-    s: usize
+    l: Vec<BencodeVariable<'a>>
 }
 
 pub trait AddArray<'a, V> {
@@ -23,8 +22,7 @@ impl<'a> BencodeArray<'a> {
 
     pub fn new() -> Self {
         Self {
-            l: Vec::new(),
-            s: 2
+            l: Vec::new()
         }
     }
 
@@ -33,13 +31,6 @@ impl<'a> BencodeArray<'a> {
     }
 
     pub fn remove(&mut self, index: usize) {
-        let s = match self.l.get(index).unwrap() {
-            BencodeVariable::Number(num) => num.byte_size(),
-            BencodeVariable::Array(arr) => arr.byte_size(),
-            BencodeVariable::Object(obj) => obj.byte_size(),
-            BencodeVariable::Bytes(byt) => byt.byte_size(),
-        };
-        self.s -= s;
         self.l.remove(index);
     }
 
@@ -116,8 +107,7 @@ impl<'a> From<Vec<BencodeVariable<'a>>> for BencodeArray<'a> {
         //WE NEED TO COUNT THE SIZE...
 
         Self {
-            l: value,
-            s: 2
+            l: value
         }
     }
 }
@@ -125,43 +115,34 @@ impl<'a> From<Vec<BencodeVariable<'a>>> for BencodeArray<'a> {
 impl<'a, const N: usize> AddArray<'a, [u8; N]> for BencodeArray<'a> {
 
     fn add(&mut self, value: [u8; N]) {
-        let value = BencodeBytes::from(value);
-        self.s += value.byte_size();
-        self.l.push(BencodeVariable::Bytes(value));
+        self.l.push(BencodeVariable::Bytes(BencodeBytes::from(value)));
     }
 }
 
 impl<'a> AddArray<'a, Vec<u8>> for BencodeArray<'a> {
 
     fn add(&mut self, value: Vec<u8>) {
-        let value = BencodeBytes::from(value);
-        self.s += value.byte_size();
-        self.l.push(BencodeVariable::Bytes(value));
+        self.l.push(BencodeVariable::Bytes(BencodeBytes::from(value)));
     }
 }
 
 impl<'a> AddArray<'a, &'a str> for BencodeArray<'a> {
 
     fn add(&mut self, value: &'a str) {
-        let value = BencodeBytes::from(value);
-        self.s += value.byte_size();
-        self.l.push(BencodeVariable::Bytes(value));
+        self.l.push(BencodeVariable::Bytes(BencodeBytes::from(value)));
     }
 }
 
 impl<'a> AddArray<'a, String> for BencodeArray<'a> {
 
     fn add(&mut self, value: String) {
-        let value = BencodeBytes::from(value);
-        self.s += value.byte_size();
-        self.l.push(BencodeVariable::Bytes(value));
+        self.l.push(BencodeVariable::Bytes(BencodeBytes::from(value)));
     }
 }
 
 impl<'a> AddArray<'a, BencodeArray<'a>> for BencodeArray<'a> {
 
     fn add(&mut self, value: BencodeArray<'a>) {
-        self.s += value.byte_size();
         self.l.push(BencodeVariable::Array(value));
     }
 }
@@ -169,7 +150,6 @@ impl<'a> AddArray<'a, BencodeArray<'a>> for BencodeArray<'a> {
 impl<'a> AddArray<'a, BencodeObject<'a>> for BencodeArray<'a> {
 
     fn add(&mut self, value: BencodeObject<'a>) {
-        self.s += value.byte_size();
         self.l.push(BencodeVariable::Object(value));
     }
 }
@@ -180,9 +160,7 @@ macro_rules! impl_array_number {
             impl<'a> AddArray<'a, $type> for BencodeArray<'a> {
 
                 fn add(&mut self, value: $type) {
-                    let value = BencodeNumber::from(value);
-                    self.s += value.byte_size();
-                    self.l.push(BencodeVariable::Number(value));
+                    self.l.push(BencodeVariable::Number(BencodeNumber::from(value)));
                 }
             }
         )*
@@ -198,7 +176,6 @@ impl<'a> Bencode<'a> for BencodeArray<'a> {
             panic!("Buffer is not a bencode array.");
         }
 
-        let mut s = off;
         let mut off = off+1;
 
         let mut res = Vec::new();
@@ -233,17 +210,13 @@ impl<'a> Bencode<'a> for BencodeArray<'a> {
             res.push(item);
         }
 
-        off += 1;
-        s = off-s;
-
         Self {
-            l: res,
-            s
+            l: res
         }
     }
 
     fn encode(&self) -> Vec<u8> {
-        let mut buf: Vec<u8> = Vec::with_capacity(self.s);
+        let mut buf: Vec<u8> = Vec::with_capacity(self.byte_size());
         buf.push(Self::TYPE.prefix());
 
         for item in &self.l {
@@ -293,6 +266,17 @@ impl<'a> Bencode<'a> for BencodeArray<'a> {
     */
 
     fn byte_size(&self) -> usize {
-        self.s
+        let mut s = 2;
+
+        for item in &self.l {
+            s += match item {
+                BencodeVariable::Number(num) => num.byte_size(),
+                BencodeVariable::Array(arr) => arr.byte_size(),
+                BencodeVariable::Object(obj) => obj.byte_size(),
+                BencodeVariable::Bytes(byt) => byt.byte_size(),
+            };
+        }
+
+        s
     }
 }

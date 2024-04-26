@@ -9,8 +9,7 @@ use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct BencodeObject<'a> {
-    m: OrderedMap<BencodeBytes, BencodeVariable<'a>>,
-    s: usize,
+    m: OrderedMap<BencodeBytes, BencodeVariable<'a>>
     //o: BencodeObserver
 }
 
@@ -25,8 +24,7 @@ impl<'a> BencodeObject<'a> {
 
     pub fn new() -> Self {
         Self {
-            m: OrderedMap::<BencodeBytes, BencodeVariable>::new(),
-            s: 2
+            m: OrderedMap::<BencodeBytes, BencodeVariable>::new()
         }
     }
 
@@ -35,15 +33,7 @@ impl<'a> BencodeObject<'a> {
     }
 
     pub fn remove(&mut self, key: &'a str) {
-        let key = BencodeBytes::from(key);
-        let s = match self.m.get(&key).unwrap() {
-            BencodeVariable::Number(num) => num.byte_size(),
-            BencodeVariable::Array(arr) => arr.byte_size(),
-            BencodeVariable::Object(obj) => obj.byte_size(),
-            BencodeVariable::Bytes(byt) => byt.byte_size(),
-        };
-        self.s -= key.byte_size()+s;
-        self.m.remove(&key);
+        self.m.remove(&BencodeBytes::from(key));
     }
 
     pub fn get_number<V>(&self, key: &'a str) -> Result<V, ()> where V: FromStr {
@@ -146,8 +136,7 @@ impl<'a> From<OrderedMap<BencodeBytes, BencodeVariable<'a>>> for BencodeObject<'
         //WE NEED TO COUNT THE SIZE...
 
         Self {
-            m: value,
-            s: 2
+            m: value
         }
     }
 }
@@ -155,58 +144,42 @@ impl<'a> From<OrderedMap<BencodeBytes, BencodeVariable<'a>>> for BencodeObject<'
 impl<'a, const N: usize> PutObject<'a, [u8; N]> for BencodeObject<'a> {
 
     fn put(&mut self, key: &'a str, value: [u8; N]) {
-        let key = BencodeBytes::from(key);
-        let value = BencodeBytes::from(value);
-        self.s += key.byte_size()+value.byte_size();
-        self.m.insert(key, BencodeVariable::Bytes(value));
+        self.m.insert(BencodeBytes::from(key), BencodeVariable::Bytes(BencodeBytes::from(value)));
     }
 }
 
 impl<'a> PutObject<'a, Vec<u8>> for BencodeObject<'a> {
 
     fn put(&mut self, key: &'a str, value: Vec<u8>) {
-        let key = BencodeBytes::from(key);
-        let value = BencodeBytes::from(value);
-        self.s += key.byte_size()+value.byte_size();
-        self.m.insert(key, BencodeVariable::Bytes(value));
+        self.m.insert(BencodeBytes::from(key), BencodeVariable::Bytes(BencodeBytes::from(value)));
     }
 }
 
 impl<'a> PutObject<'a, &'a str> for BencodeObject<'a> {
 
     fn put(&mut self, key: &'a str, value: &'a str) {
-        let key = BencodeBytes::from(key);
-        let value = BencodeBytes::from(value);
-        self.s += key.byte_size()+value.byte_size();
-        self.m.insert(key, BencodeVariable::Bytes(value));
+        self.m.insert(BencodeBytes::from(key), BencodeVariable::Bytes(BencodeBytes::from(value)));
     }
 }
 
 impl<'a> PutObject<'a, String> for BencodeObject<'a> {
 
     fn put(&mut self, key: &'a str, value: String) {
-        let key = BencodeBytes::from(key);
-        let value = BencodeBytes::from(value);
-        self.s += key.byte_size()+value.byte_size();
-        self.m.insert(key, BencodeVariable::Bytes(value));
+        self.m.insert(BencodeBytes::from(key), BencodeVariable::Bytes(BencodeBytes::from(value)));
     }
 }
 
 impl<'a> PutObject<'a, BencodeArray<'a>> for BencodeObject<'a> {
 
     fn put(&mut self, key: &'a str, value: BencodeArray<'a>) {
-        let key = BencodeBytes::from(key);
-        self.s += key.byte_size()+value.byte_size();
-        self.m.insert(key, BencodeVariable::Array(value));
+        self.m.insert(BencodeBytes::from(key), BencodeVariable::Array(value));
     }
 }
 
 impl<'a> PutObject<'a, BencodeObject<'a>> for BencodeObject<'a> {
 
     fn put(&mut self, key: &'a str, value: BencodeObject<'a>) {
-        let key = BencodeBytes::from(key);
-        self.s += key.byte_size()+value.byte_size();
-        self.m.insert(key, BencodeVariable::Object(value));
+        self.m.insert(BencodeBytes::from(key), BencodeVariable::Object(value));
     }
 }
 
@@ -216,10 +189,7 @@ macro_rules! impl_object_number {
             impl<'a> PutObject<'a, $type> for BencodeObject<'a> {
 
                 fn put(&mut self, key: &'a str, value: $type) {
-                    let key = BencodeBytes::from(key);
-                    let value = BencodeNumber::from(value);
-                    self.s += key.byte_size()+value.byte_size();
-                    self.m.insert(key, BencodeVariable::Number(value));
+                    self.m.insert(BencodeBytes::from(key), BencodeVariable::Number(BencodeNumber::from(value)));
                 }
             }
         )*
@@ -235,7 +205,6 @@ impl<'a> Bencode<'a> for BencodeObject<'a> {
             panic!("Buffer is not a bencode array.");
         }
 
-        let mut s = off;
         let mut off = off+1;
 
         let mut res = OrderedMap::<BencodeBytes, BencodeVariable>::new();//::with_hasher(Default::default());
@@ -272,17 +241,13 @@ impl<'a> Bencode<'a> for BencodeObject<'a> {
             res.insert(key, value);
         }
 
-        off += 1;
-        s = off-s;
-
         Self {
-            m: res,
-            s
+            m: res
         }
     }
 
     fn encode(&self) -> Vec<u8> {
-        let mut buf: Vec<u8> = Vec::with_capacity(self.s);
+        let mut buf: Vec<u8> = Vec::with_capacity(self.byte_size());
         buf.push(Self::TYPE.prefix());
 
         for (key, value) in self.m.iter() {
@@ -338,6 +303,18 @@ impl<'a> Bencode<'a> for BencodeObject<'a> {
     */
 
     fn byte_size(&self) -> usize {
-        self.s
+        let mut s = 2;
+
+        for (key, value) in self.m.iter() {
+            s += key.byte_size();
+            s += match value {
+                BencodeVariable::Number(num) => num.byte_size(),
+                BencodeVariable::Array(arr) => arr.byte_size(),
+                BencodeVariable::Object(obj) => obj.byte_size(),
+                BencodeVariable::Bytes(byt) => byt.byte_size(),
+            };
+        }
+
+        s
     }
 }
