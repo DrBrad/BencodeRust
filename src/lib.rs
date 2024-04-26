@@ -33,7 +33,9 @@ mod tests {
         //z.deref_mut();
         //obj.put("blank", "blonk");
 
+
         let encoded = obj.encode();
+        println!("EXPECTED: {} ACTUAL: {}", obj.byte_size(), encoded.len());
         println!("{:?}", encoded);
 
         println!("{}", obj.to_string());
