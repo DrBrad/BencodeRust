@@ -3,7 +3,7 @@ use std::str::{from_utf8, FromStr};
 use std::slice::from_raw_parts;
 use std::mem::forget;
 
-use crate::variables::inter::bencode_variable::Bencode;
+use crate::variables::inter::bencode_variable::{Bencode, Bencode2};
 use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
@@ -53,8 +53,7 @@ macro_rules! impl_decodable_number {
 
 impl_decodable_number!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 isize f32 f64);
 
-/*
-impl<'a> Bencode for BencodeNumber<'a> {
+impl<'a> Bencode2<'a> for BencodeNumber<'a> {
 
     fn encode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::with_capacity(self.s);
@@ -66,7 +65,7 @@ impl<'a> Bencode for BencodeNumber<'a> {
     }
 
     fn decode_with_offset(buf: &[u8], off: usize) -> Self where Self: Sized {
-        /.*
+        /*
         if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
             panic!("Buffer is not a bencode bytes / string.");
         }
@@ -90,14 +89,14 @@ impl<'a> Bencode for BencodeNumber<'a> {
             n: bytes,
             s
         }
-        *./
+        */
         Self {
             n: &[0u8],
             s: 1
         }
     }
 
-    fn as_any(&self) -> &dyn Any {
+    fn as_any(&'a self) -> &dyn Any {
         self
     }
 
@@ -105,7 +104,7 @@ impl<'a> Bencode for BencodeNumber<'a> {
         self.s
     }
 }
-*/
+
 /*
 impl<'a> Bencode<'a> for BencodeNumber<'a> {
 
