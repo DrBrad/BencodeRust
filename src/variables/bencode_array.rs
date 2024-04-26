@@ -9,7 +9,7 @@ use crate::variables::inter::bencode_type::BencodeType;
 
 //#[derive(Debug, Clone, PartialEq)]
 pub struct BencodeArray {
-    l: Vec<u8>//Box<dyn Bencode>>
+    l: Vec<Box<dyn Bencode>>
 }
 
 pub trait AddArray<V> {
@@ -26,16 +26,16 @@ impl BencodeArray {
             l: Vec::new()
         }
     }
-
-    /*
-    pub fn contains(&self, var: &'a BencodeVariable) -> bool {
+/*
+    pub fn contains(&self, var: &Box<dyn Bencode>) -> bool {
         self.l.contains(var)
     }
-
+*/
     pub fn remove(&mut self, index: usize) {
         self.l.remove(index);
     }
 
+    /*
     pub fn get_number<V>(&self, index: usize) -> Result<V, ()> where V: FromStr {
         match self.l.get(index).unwrap() {
             BencodeVariable::Number(num) => num.parse::<V>(),
@@ -115,7 +115,7 @@ impl From<Vec<Box<dyn Bencode>>> for BencodeArray {
     }
 }
 */
-/*
+
 impl<const N: usize> AddArray<[u8; N]> for BencodeArray {
 
     fn add(&mut self, value: [u8; N]) {
@@ -143,7 +143,7 @@ impl AddArray<String> for BencodeArray {
         self.l.push(Box::new(BencodeBytes::from(value)));
     }
 }
-*/
+
 /*
 impl AddArray<BencodeArray> for BencodeArray {
 
@@ -176,6 +176,40 @@ macro_rules! impl_array_number {
 
 impl_array_number!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 isize f32 f64);
 */
+impl Bencode for BencodeArray {
+
+    fn encode(&self) -> Vec<u8> {
+        let mut buf: Vec<u8> = Vec::with_capacity(self.byte_size());
+        buf.push(Self::TYPE.prefix());
+
+        for item in &self.l {
+            buf.extend_from_slice(&item.encode());
+        }
+
+        buf.push(Self::TYPE.suffix());
+        buf
+    }
+
+    fn decode_with_offset(buf: &[u8], off: usize) -> Self {
+        Self {
+            l: Vec::new()
+        }
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn byte_size(&self) -> usize {
+        let mut s = 2;
+
+        for item in &self.l {
+            s += item.byte_size();
+        }
+
+        s
+    }
+}
 /*
 impl Bencode for BencodeArray {
 
