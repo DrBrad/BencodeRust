@@ -38,7 +38,7 @@ pub trait Bencode {
 
 
 
-pub trait Bencode2<'a> {
+pub trait Bencode2 {
 
     /*
     fn decode(buf: &[u8]) -> Self where Self: Sized {
@@ -56,7 +56,7 @@ pub trait Bencode2<'a> {
 
     fn decode_with_offset(buf: &[u8], off: usize) -> Self where Self: Sized;
 
-    fn as_any(&'a self) -> &dyn Any;
+    fn as_any(&self) -> &dyn Any;
 
     fn byte_size(&self) -> usize;
 }

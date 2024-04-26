@@ -53,7 +53,7 @@ macro_rules! impl_decodable_number {
 
 impl_decodable_number!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 isize f32 f64);
 
-impl<'a> Bencode2<'a> for BencodeNumber<'a> {
+impl Bencode2 for BencodeNumber<'static> {
 
     fn encode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::with_capacity(self.s);
@@ -96,7 +96,7 @@ impl<'a> Bencode2<'a> for BencodeNumber<'a> {
         }
     }
 
-    fn as_any(&'a self) -> &dyn Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 
