@@ -3,7 +3,7 @@ use std::str::{from_utf8, FromStr};
 use std::slice::from_raw_parts;
 use std::mem::forget;
 
-use crate::variables::inter::bencode_variable::{Bencode, Bencode2};
+use crate::variables::inter::bencode_variable::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
@@ -53,7 +53,7 @@ macro_rules! impl_decodable_number {
 
 impl_decodable_number!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 isize f32 f64);
 
-impl Bencode2 for BencodeNumber<'static> {
+impl Bencode for BencodeNumber<'static> {
 
     fn encode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::with_capacity(self.s);
