@@ -7,12 +7,12 @@ use crate::variables::inter::bencode_variable::{Bencode, Bencode2};
 use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
-pub struct BencodeNumber<'a> {
-    n: &'a [u8],
+pub struct BencodeNumber {
+    n: Vec<u8>,
     s: usize
 }
 
-impl<'a> BencodeNumber<'a> {
+impl BencodeNumber {
 
     const TYPE: BencodeType = BencodeType::Number;
 
@@ -29,9 +29,17 @@ impl<'a> BencodeNumber<'a> {
 macro_rules! impl_decodable_number {
     ($($type:ty)*) => {
         $(
-            impl<'a> From<$type> for BencodeNumber<'a> {
+            impl From<$type> for BencodeNumber {
 
                 fn from(value: $type) -> Self {
+                    let value = value.to_string().into_bytes();
+                    let s = value.len()+2;
+
+                    Self {
+                        n: value,
+                        s
+                    }
+                    /*
                     let value = value.to_string();
                     let size = value.len()+2;
 
@@ -45,6 +53,7 @@ macro_rules! impl_decodable_number {
                             s: size
                         }
                     }
+                    */
                 }
             }
         )*
@@ -53,19 +62,18 @@ macro_rules! impl_decodable_number {
 
 impl_decodable_number!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 isize f32 f64);
 
-impl<'a> Bencode2 for BencodeNumber<'a> {
+impl Bencode for BencodeNumber {
 
     fn encode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::with_capacity(self.s);
 
         r.push(Self::TYPE.prefix());
-        r.extend_from_slice(self.n);
+        r.extend_from_slice(&self.n);
         r.push(Self::TYPE.suffix());
         r
     }
 
     fn decode_with_offset(buf: &[u8], off: usize) -> Self where Self: Sized {
-        /*
         if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
             panic!("Buffer is not a bencode bytes / string.");
         }
@@ -80,7 +88,7 @@ impl<'a> Bencode2 for BencodeNumber<'a> {
             off += 1;
         }
 
-        let bytes = &buf[s..off];
+        let bytes = buf[s..off].to_vec();
 
         off += 1;
         s = off+1-s;
@@ -89,14 +97,9 @@ impl<'a> Bencode2 for BencodeNumber<'a> {
             n: bytes,
             s
         }
-        */
-        Self {
-            n: &[0u8],
-            s: 1
-        }
     }
 
-    fn as_any(&'static self) -> &dyn Any {
+    fn as_any(&self) -> &dyn Any {
     //fn as_any(&self) -> &dyn Any {
         self
     }

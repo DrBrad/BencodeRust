@@ -4,7 +4,7 @@ use std::str::FromStr;
 use crate::variables::bencode_bytes::BencodeBytes;
 use crate::variables::bencode_number::BencodeNumber;
 use crate::variables::bencode_object::BencodeObject;
-use crate::variables::inter::bencode_variable::Bencode;
+use crate::variables::inter::bencode_variable::{Bencode, Bencode2};
 use crate::variables::inter::bencode_type::BencodeType;
 
 //#[derive(Debug, Clone, PartialEq)]
@@ -176,7 +176,7 @@ macro_rules! impl_array_number {
 
 impl_array_number!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 isize f32 f64);
 */
-impl Bencode for BencodeArray {
+impl Bencode2 for BencodeArray {
 
     fn encode(&self) -> Vec<u8> {
         let mut buf: Vec<u8> = Vec::with_capacity(self.byte_size());

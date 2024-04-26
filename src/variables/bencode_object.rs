@@ -36,6 +36,11 @@ impl BencodeObject {
         self.m.remove(&BencodeBytes::from(key));
     }
 
+    pub fn get_number<V>(&self, key: &str) -> Result<V, ()> where V: FromStr {
+        let key = BencodeBytes::from(key);
+        self.m.get(&key).unwrap().as_any().downcast_ref::<BencodeNumber>().unwrap().parse::<V>()
+    }
+
     pub fn get_bytes(&self, key: &str) -> Result<&[u8], ()> {
         let key = BencodeBytes::from(key);
         Ok(self.m.get(&key).unwrap().as_any().downcast_ref::<BencodeBytes>().unwrap().as_bytes())
@@ -47,15 +52,6 @@ impl BencodeObject {
     }
 
     /*
-    pub fn get_number<V>(&self, key: &'a str) -> Result<V, ()> where V: FromStr {
-        let key = BencodeBytes::from(key);
-
-        match self.m.get(&key).unwrap() {
-            BencodeVariable::Number(num) => num.parse::<V>(),
-            _ => Err(())
-        }
-    }
-
     pub fn get_array(&self, key: &str) -> Result<&BencodeArray<'a>, ()> {
         let key = BencodeBytes::from(key);
 
@@ -178,7 +174,7 @@ impl PutObject<BencodeObject> for BencodeObject {
         self.m.insert(BencodeBytes::from(key), Box::new(value));
     }
 }
-/*
+
 macro_rules! impl_object_number {
     ($($type:ty)*) => {
         $(
@@ -193,7 +189,7 @@ macro_rules! impl_object_number {
 }
 
 impl_object_number!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 isize f32 f64);
-*/
+
 impl Bencode for BencodeObject {
 
     fn encode(&self) -> Vec<u8> {
@@ -225,10 +221,9 @@ impl Bencode for BencodeObject {
 
             let value = match type_ {
                 BencodeType::Number => {
-                    //let value = BencodeNumber::decode_with_offset(buf, off);
-                    //off += value.byte_size();
-                    //BencodeVariable::Number(value)
-                    unimplemented!()
+                    let value = BencodeNumber::decode_with_offset(buf, off);
+                    off += value.byte_size();
+                    Box::new(value) as Box<dyn Bencode>
                 },
                 BencodeType::Array => {
                     //let value = BencodeArray::decode_with_offset(buf, off);

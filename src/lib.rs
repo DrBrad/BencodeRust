@@ -17,6 +17,7 @@ mod tests {
 
         let mut obj = BencodeObject::new();
         obj.put("b", "bar");
+        obj.put("t", 100.67);
 
         println!("{:?}", obj.get_string("b").unwrap());
 
@@ -25,7 +26,7 @@ mod tests {
 
         let decoded = BencodeObject::decode(encoded.as_slice());
         println!("{}", decoded.get_string("b").unwrap());
-
+        println!("{}", decoded.get_number::<f32>("t").unwrap());
 
         /*
         let mut obj = BencodeObject::new();
