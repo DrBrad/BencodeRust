@@ -209,7 +209,7 @@ impl<'a> Bencode<'a> for BencodeObject<'a> {
 
         let mut res = OrderedMap::<BencodeBytes, BencodeVariable>::new();//::with_hasher(Default::default());
 
-        while buf[off] != Self::TYPE.suffix() as u8 {
+        while buf[off] != Self::TYPE.suffix() {
             let key = BencodeBytes::decode_with_offset(buf, off);
             off += key.byte_size();
             let type_ = BencodeType::type_by_prefix(buf[off]);
