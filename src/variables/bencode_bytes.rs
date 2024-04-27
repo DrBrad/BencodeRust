@@ -21,10 +21,6 @@ impl BencodeBytes {
     pub fn as_str(&self) -> Result<&str, ()> {
         from_utf8(&self.b).map_err(|_| ())
     }
-
-    pub fn to_string(&self) -> String {
-        String::from_utf8_lossy(&self.b).to_string()
-    }
 }
 
 impl<const N: usize> From<[u8; N]> for BencodeBytes {
@@ -179,11 +175,20 @@ impl Bencode for BencodeBytes {
         }
     }
     */
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
     }
 
     fn byte_size(&self) -> usize {
         self.s
+    }
+
+    fn to_string(&self) -> String {
+        String::from_utf8_lossy(&self.b).to_string()
     }
 }

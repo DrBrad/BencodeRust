@@ -1,9 +1,7 @@
 use std::any::Any;
 use std::str::{from_utf8, FromStr};
-use std::slice::from_raw_parts;
-use std::mem::forget;
 
-use crate::variables::inter::bencode_variable::{Bencode, Bencode2};
+use crate::variables::inter::bencode_variable::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
@@ -19,10 +17,6 @@ impl BencodeNumber {
     pub fn parse<V>(&self) -> Result<V, ()> where V: FromStr {
         let str = from_utf8(&self.n).map_err(|_| ());//..unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
         str?.parse::<V>().map_err(|_| ())//.unwrap_or_else(|_| panic!("Failed to parse to Number"))
-    }
-
-    pub fn to_string(&self) -> String {
-        String::from_utf8_lossy(&self.n).to_string()
     }
 }
 
@@ -99,6 +93,10 @@ impl Bencode for BencodeNumber {
         }
     }
 
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+
     fn as_any(&self) -> &dyn Any {
     //fn as_any(&self) -> &dyn Any {
         self
@@ -106,6 +104,10 @@ impl Bencode for BencodeNumber {
 
     fn byte_size(&self) -> usize {
         self.s
+    }
+
+    fn to_string(&self) -> String {
+        String::from_utf8_lossy(&self.n).to_string()
     }
 }
 

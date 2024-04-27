@@ -1,8 +1,4 @@
 use std::any::Any;
-use crate::variables::bencode_array::BencodeArray;
-use crate::variables::bencode_bytes::BencodeBytes;
-use crate::variables::bencode_number::BencodeNumber;
-use crate::variables::bencode_object::BencodeObject;
 
 /*
 #[derive(Debug, Clone, PartialEq)]
@@ -33,7 +29,11 @@ pub trait Bencode {
 
     fn as_any(&self) -> &dyn Any;
 
+    fn as_any_mut(&mut self) -> &mut dyn Any;
+
     fn byte_size(&self) -> usize;
+
+    fn to_string(&self) -> String;
 }
 
 

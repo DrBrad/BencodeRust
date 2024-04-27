@@ -1,10 +1,9 @@
 use std::any::Any;
 use std::str::FromStr;
-//use crate::variables::inter::bencode_variable::BencodeVariable;
 use crate::variables::bencode_bytes::BencodeBytes;
 use crate::variables::bencode_number::BencodeNumber;
 use crate::variables::bencode_object::BencodeObject;
-use crate::variables::inter::bencode_variable::{Bencode, Bencode2};
+use crate::variables::inter::bencode_variable::Bencode;
 use crate::variables::inter::bencode_type::BencodeType;
 
 //#[derive(Debug, Clone, PartialEq)]
@@ -35,73 +34,33 @@ impl BencodeArray {
         self.l.remove(index);
     }
 
-    /*
     pub fn get_number<V>(&self, index: usize) -> Result<V, ()> where V: FromStr {
-        match self.l.get(index).unwrap() {
-            BencodeVariable::Number(num) => num.parse::<V>(),
-            _ => Err(())
-        }
+        self.l.get(index).unwrap().as_any().downcast_ref::<BencodeNumber>().unwrap().parse::<V>()
     }
 
     pub fn get_array(&self, index: usize) -> Result<&BencodeArray, ()> {
-        match self.l.get(index).unwrap() {
-            BencodeVariable::Array(arr) => Ok(arr),
-            _ => Err(())
-        }
+        Ok(self.l.get(index).unwrap().as_any().downcast_ref::<BencodeArray>().unwrap())
     }
 
     pub fn get_array_mut(&mut self, index: usize) -> Result<&mut BencodeArray, ()> {
-        match self.l.get_mut(index).unwrap() {
-            BencodeVariable::Array(arr) => Ok(arr),
-            _ => Err(())
-        }
+        Ok(self.l.get_mut(index).unwrap().as_any_mut().downcast_mut::<BencodeArray>().unwrap())
     }
 
     pub fn get_object(&self, index: usize) -> Result<&BencodeObject, ()> {
-        match self.l.get(index).unwrap() {
-            BencodeVariable::Object(obj) => Ok(obj),
-            _ => Err(())
-        }
+        Ok(self.l.get(index).unwrap().as_any().downcast_ref::<BencodeObject>().unwrap())
     }
 
     pub fn get_object_mut(&mut self, index: usize) -> Result<&mut BencodeObject, ()> {
-        match self.l.get_mut(index).unwrap() {
-            BencodeVariable::Object(obj) => Ok(obj),
-            _ => Err(())
-        }
+        Ok(self.l.get_mut(index).unwrap().as_any_mut().downcast_mut::<BencodeObject>().unwrap())
     }
 
     pub fn get_bytes(&self, index: usize) -> Result<&[u8], ()> {
-        match self.l.get(index).unwrap() {
-            BencodeVariable::Bytes(bytes) => Ok(bytes.as_bytes()),
-            _ => Err(())
-        }
+        Ok(self.l.get(index).unwrap().as_any().downcast_ref::<BencodeBytes>().unwrap().as_bytes())
     }
 
     pub fn get_string(&self, index: usize) -> Result<&str, ()> {
-        match self.l.get(index).unwrap() {
-            BencodeVariable::Bytes(bytes) => bytes.as_str(),
-            _ => Err(())
-        }
+        self.l.get(index).unwrap().as_any().downcast_ref::<BencodeBytes>().unwrap().as_str()
     }
-
-    pub fn to_string(&self) -> String {
-        let mut res = "[\r\n".to_string();
-
-        for item in self.l.iter() {
-            let item = match item {
-                BencodeVariable::Number(num) => format!("\t\x1b[33m{}\x1b[0m\r\n", num.to_string()),
-                BencodeVariable::Array(arr) => format!("\t{}\r\n", arr.to_string().replace("\r\n", "\r\n\t")),
-                BencodeVariable::Object(obj) => format!("\t{}\r\n", obj.to_string().replace("\r\n", "\r\n\t")),
-                BencodeVariable::Bytes(byt) => format!("\t\x1b[34m{:?}\x1b[0m\r\n", byt.to_string())
-            };
-            res.push_str(item.as_str());
-        }
-
-        res.push_str("]");
-        res
-    }
-    */
 }
 /*
 impl From<Vec<Box<dyn Bencode>>> for BencodeArray {
@@ -231,6 +190,10 @@ impl Bencode for BencodeArray {
         }
     }
 
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
     }
@@ -243,5 +206,27 @@ impl Bencode for BencodeArray {
         }
 
         s
+    }
+
+    fn to_string(&self) -> String {
+        let mut res = "[\r\n".to_string();
+
+        for item in self.l.iter() {
+            if let Some(num) = item.as_any().downcast_ref::<BencodeNumber>() {
+                res.push_str(format!("\t\x1b[33m{}\x1b[0m\r\n", num.to_string()).as_str());
+
+            } else if let Some(arr) = item.as_any().downcast_ref::<BencodeArray>() {
+                res.push_str(format!("\t{}\r\n", arr.to_string().replace("\r\n", "\r\n\t")).as_str());
+
+            } else if let Some(obj) = item.as_any().downcast_ref::<BencodeObject>() {
+                res.push_str(format!("\t{}\r\n", obj.to_string().replace("\r\n", "\r\n\t")).as_str());
+
+            } else if let Some(byt) = item.as_any().downcast_ref::<BencodeBytes>() {
+                res.push_str(format!("\t\x1b[34m{:?}\x1b[0m\r\n", byt.to_string()).as_str());
+            }
+        }
+
+        res.push_str("]");
+        res
     }
 }
