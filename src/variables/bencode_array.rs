@@ -3,12 +3,12 @@ use std::str::FromStr;
 use crate::variables::bencode_bytes::BencodeBytes;
 use crate::variables::bencode_number::BencodeNumber;
 use crate::variables::bencode_object::BencodeObject;
-use crate::variables::inter::bencode_variable::Bencode;
+use crate::variables::inter::bencode_variable::BencodeVariable;
 use crate::variables::inter::bencode_type::BencodeType;
 
 //#[derive(Debug, Clone, PartialEq)]
 pub struct BencodeArray {
-    l: Vec<Box<dyn Bencode>>
+    l: Vec<Box<dyn BencodeVariable>>
 }
 
 pub trait AddArray<V> {
@@ -25,11 +25,11 @@ impl BencodeArray {
             l: Vec::new()
         }
     }
-/*
-    pub fn contains(&self, var: &Box<dyn Bencode>) -> bool {
-        self.l.contains(var)
+
+    pub fn contains(&self, var: &Box<dyn BencodeVariable>) -> bool {
+        self.l.iter().any(|item| item.as_ref() as *const _ == var.as_ref() as *const _)
     }
-*/
+
     pub fn remove(&mut self, index: usize) {
         self.l.remove(index);
     }
@@ -132,7 +132,7 @@ macro_rules! impl_array_number {
 
 impl_array_number!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 isize f32 f64);
 
-impl Bencode for BencodeArray {
+impl BencodeVariable for BencodeArray {
 
     fn encode(&self) -> Vec<u8> {
         let mut buf: Vec<u8> = Vec::with_capacity(self.byte_size());
@@ -162,22 +162,22 @@ impl Bencode for BencodeArray {
                 BencodeType::Number => {
                     let value = BencodeNumber::decode_with_offset(buf, off);
                     off += value.byte_size();
-                    Box::new(value) as Box<dyn Bencode>
+                    Box::new(value) as Box<dyn BencodeVariable>
                 },
                 BencodeType::Array => {
                     let value = BencodeArray::decode_with_offset(buf, off);
                     off += value.byte_size();
-                    Box::new(value) as Box<dyn Bencode>
+                    Box::new(value) as Box<dyn BencodeVariable>
                 },
                 BencodeType::Object => {
                     let value = BencodeObject::decode_with_offset(buf, off);
                     off += value.byte_size();
-                    Box::new(value) as Box<dyn Bencode>
+                    Box::new(value) as Box<dyn BencodeVariable>
                 },
                 BencodeType::Bytes => {
                     let value = BencodeBytes::decode_with_offset(buf, off);
                     off += value.byte_size();
-                    Box::new(value) as Box<dyn Bencode>
+                    Box::new(value) as Box<dyn BencodeVariable>
                 },
                 _ => unimplemented!()
             };

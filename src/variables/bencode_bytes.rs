@@ -1,7 +1,7 @@
 use std::any::Any;
 use std::str::from_utf8;
 
-use crate::variables::inter::bencode_variable::Bencode;
+use crate::variables::inter::bencode_variable::BencodeVariable;
 use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
@@ -81,35 +81,7 @@ impl From<String> for BencodeBytes {
     }
 }
 
-impl Bencode for BencodeBytes {
-
-    /*
-    fn decode_with_offset(buf: &[u8], off: usize) -> Self {
-        if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
-            panic!("Buffer is not a bencode bytes / string.");
-        }
-
-        let mut off = off;
-        let mut len_bytes = [0u8; 8];
-        let mut s = off;
-
-        while buf[off] != Self::TYPE.delimiter() {
-            len_bytes[off - s] = buf[off];
-            off += 1;
-        }
-
-        let length = len_bytes.iter().take(off - s).fold(0, |acc, &b| acc * 10 + (b - b'0') as usize);
-        let bytes = buf[off + 1..off + 1 + length].to_vec();
-
-        off += 1+length;
-        s = off-s;
-
-        Self {
-            b: bytes,
-            s
-        }
-    }
-    */
+impl BencodeVariable for BencodeBytes {
 
     fn encode(&self) -> Vec<u8> {
         let mut r: Vec<u8> = Vec::with_capacity(self.s);
