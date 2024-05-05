@@ -34,31 +34,31 @@ impl BencodeArray {
         self.l.remove(index);
     }
 
-    pub fn get_number<V>(&self, index: usize) -> Result<V, ()> where V: FromStr {
+    pub fn get_number<V>(&self, index: usize) -> Result<V, String> where V: FromStr {
         self.l.get(index).unwrap().as_any().downcast_ref::<BencodeNumber>().unwrap().parse::<V>()
     }
 
-    pub fn get_array(&self, index: usize) -> Result<&BencodeArray, ()> {
+    pub fn get_array(&self, index: usize) -> Result<&BencodeArray, String> {
         Ok(self.l.get(index).unwrap().as_any().downcast_ref::<BencodeArray>().unwrap())
     }
 
-    pub fn get_array_mut(&mut self, index: usize) -> Result<&mut BencodeArray, ()> {
+    pub fn get_array_mut(&mut self, index: usize) -> Result<&mut BencodeArray, String> {
         Ok(self.l.get_mut(index).unwrap().as_any_mut().downcast_mut::<BencodeArray>().unwrap())
     }
 
-    pub fn get_object(&self, index: usize) -> Result<&BencodeObject, ()> {
+    pub fn get_object(&self, index: usize) -> Result<&BencodeObject, String> {
         Ok(self.l.get(index).unwrap().as_any().downcast_ref::<BencodeObject>().unwrap())
     }
 
-    pub fn get_object_mut(&mut self, index: usize) -> Result<&mut BencodeObject, ()> {
+    pub fn get_object_mut(&mut self, index: usize) -> Result<&mut BencodeObject, String> {
         Ok(self.l.get_mut(index).unwrap().as_any_mut().downcast_mut::<BencodeObject>().unwrap())
     }
 
-    pub fn get_bytes(&self, index: usize) -> Result<&[u8], ()> {
+    pub fn get_bytes(&self, index: usize) -> Result<&[u8], String> {
         Ok(self.l.get(index).unwrap().as_any().downcast_ref::<BencodeBytes>().unwrap().as_bytes())
     }
 
-    pub fn get_string(&self, index: usize) -> Result<&str, ()> {
+    pub fn get_string(&self, index: usize) -> Result<&str, String> {
         self.l.get(index).unwrap().as_any().downcast_ref::<BencodeBytes>().unwrap().as_str()
     }
 }

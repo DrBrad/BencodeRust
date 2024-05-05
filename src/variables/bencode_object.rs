@@ -35,37 +35,37 @@ impl BencodeObject {
         self.m.remove(&BencodeBytes::from(key));
     }
 
-    pub fn get_number<V>(&self, key: &str) -> Result<V, ()> where V: FromStr {
+    pub fn get_number<V>(&self, key: &str) -> Result<V, String> where V: FromStr {
         let key = BencodeBytes::from(key);
         self.m.get(&key).unwrap().as_any().downcast_ref::<BencodeNumber>().unwrap().parse::<V>()
     }
 
-    pub fn get_array(&self, key: &str) -> Result<&BencodeArray, ()> {
+    pub fn get_array(&self, key: &str) -> Result<&BencodeArray, String> {
         let key = BencodeBytes::from(key);
         Ok(self.m.get(&key).unwrap().as_any().downcast_ref::<BencodeArray>().unwrap())
     }
 
-    pub fn get_array_mut(&mut self, key: &str) -> Result<&mut BencodeArray, ()> {
+    pub fn get_array_mut(&mut self, key: &str) -> Result<&mut BencodeArray, String> {
         let key = BencodeBytes::from(key);
         Ok(self.m.get_mut(&key).unwrap().as_any_mut().downcast_mut::<BencodeArray>().unwrap())
     }
 
-    pub fn get_object(&self, key: &str) -> Result<&BencodeObject, ()> {
+    pub fn get_object(&self, key: &str) -> Result<&BencodeObject, String> {
         let key = BencodeBytes::from(key);
         Ok(self.m.get(&key).unwrap().as_any().downcast_ref::<BencodeObject>().unwrap())
     }
 
-    pub fn get_object_mut(&mut self, key: &str) -> Result<&mut BencodeObject, ()> {
+    pub fn get_object_mut(&mut self, key: &str) -> Result<&mut BencodeObject, String> {
         let key = BencodeBytes::from(key);
         Ok(self.m.get_mut(&key).unwrap().as_any_mut().downcast_mut::<BencodeObject>().unwrap())
     }
 
-    pub fn get_bytes(&self, key: &str) -> Result<&[u8], ()> {
+    pub fn get_bytes(&self, key: &str) -> Result<&[u8], String> {
         let key = BencodeBytes::from(key);
         Ok(self.m.get(&key).unwrap().as_any().downcast_ref::<BencodeBytes>().unwrap().as_bytes())
     }
 
-    pub fn get_string(&self, key: &str) -> Result<&str, ()> {
+    pub fn get_string(&self, key: &str) -> Result<&str, String> {
         let key = BencodeBytes::from(key);
         self.m.get(&key).unwrap().as_any().downcast_ref::<BencodeBytes>().unwrap().as_str()
     }

@@ -18,8 +18,8 @@ impl BencodeBytes {
         &self.b
     }
 
-    pub fn as_str(&self) -> Result<&str, ()> {
-        from_utf8(&self.b).map_err(|_| ())
+    pub fn as_str(&self) -> Result<&str, String> {
+        from_utf8(&self.b).map_err(|e| e.to_string())
     }
 }
 
