@@ -167,10 +167,10 @@ impl BencodeVariable for BencodeObject {
         buf
     }
 
-    fn decode_with_offset(buf: &[u8], off: usize) -> Result<Self, ()> where Self: Sized {//Self where Self: Sized {
-        let type_ = BencodeType::type_by_prefix(buf[off]).map_err(|_| ())?;
+    fn decode_with_offset(buf: &[u8], off: usize) -> Result<Self, String> where Self: Sized {//Self where Self: Sized {
+        let type_ = BencodeType::type_by_prefix(buf[off]).map_err(|e| e.to_string())?;
         if type_ != Self::TYPE {
-            return Err(());
+            return Err("Byte array is not a bencode object.".to_string());
         }
 
         let mut off = off+1;

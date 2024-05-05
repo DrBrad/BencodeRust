@@ -41,13 +41,13 @@ impl BencodeType {
         }
     }
 
-    pub fn type_by_prefix(c: u8) -> Result<Self, ()> {
+    pub fn type_by_prefix(c: u8) -> Result<Self, String> {
         for btype in [BencodeType::Number, BencodeType::Array, BencodeType::Object, BencodeType::Bytes] {
             if btype.is_prefix(c) {
                 return Ok(btype);
             }
         }
 
-        Err(())
+        Err("Type prefix is not valid.".to_string())
     }
 }

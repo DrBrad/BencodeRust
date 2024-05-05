@@ -146,10 +146,10 @@ impl BencodeVariable for BencodeArray {
         buf
     }
 
-    fn decode_with_offset(buf: &[u8], off: usize) -> Result<Self, ()> where Self: Sized {
-        let type_ = BencodeType::type_by_prefix(buf[off]).map_err(|_| ())?;
+    fn decode_with_offset(buf: &[u8], off: usize) -> Result<Self, String> where Self: Sized {
+        let type_ = BencodeType::type_by_prefix(buf[off]).map_err(|e| e.to_string())?;
         if type_ != Self::TYPE {
-            return Err(());
+            return Err("Byte array is not a bencode array.".to_string());
         }
 
         let mut off = off+1;
@@ -190,11 +190,11 @@ impl BencodeVariable for BencodeArray {
         })
     }
 
-    fn as_any_mut(&mut self) -> &mut dyn Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 
-    fn as_any(&self) -> &dyn Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 
