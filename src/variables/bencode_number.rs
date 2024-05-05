@@ -15,8 +15,8 @@ impl BencodeNumber {
     const TYPE: BencodeType = BencodeType::Number;
 
     pub fn parse<V>(&self) -> Result<V, ()> where V: FromStr {
-        let str = from_utf8(&self.n).map_err(|_| ());//..unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
-        str?.parse::<V>().map_err(|_| ())//.unwrap_or_else(|_| panic!("Failed to parse to Number"))
+        let str = from_utf8(&self.n).map_err(|_| ())?;
+        str.parse::<V>().map_err(|_| ())
     }
 }
 
@@ -67,9 +67,10 @@ impl BencodeVariable for BencodeNumber {
         r
     }
 
-    fn decode_with_offset(buf: &[u8], off: usize) -> Self where Self: Sized {
-        if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
-            panic!("Buffer is not a bencode bytes / string.");
+    fn decode_with_offset(buf: &[u8], off: usize) -> Result<Self, ()> where Self: Sized {
+        let type_ = BencodeType::type_by_prefix(buf[off]).map_err(|_| ())?;
+        if type_ != Self::TYPE {
+            return Err(());
         }
 
         let mut off = off+1;
@@ -87,10 +88,10 @@ impl BencodeVariable for BencodeNumber {
         off += 1;
         s = off+1-s;
 
-        Self {
+        Ok(Self {
             n: bytes,
             s
-        }
+        })
     }
 
     fn as_any_mut(&mut self) -> &mut dyn Any {
@@ -110,68 +111,3 @@ impl BencodeVariable for BencodeNumber {
         String::from_utf8_lossy(&self.n).to_string()
     }
 }
-
-/*
-impl<'a> Bencode<'a> for BencodeNumber<'a> {
-
-    fn decode_with_offset(buf: &'a [u8], off: usize) -> Self {
-        if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
-            panic!("Buffer is not a bencode bytes / string.");
-        }
-
-        let mut off = off+1;
-
-        let mut c = [0u8; 32];
-        let mut s = off;
-
-        while buf[off] != Self::TYPE.suffix() {
-            c[off - s] = buf[off];
-            off += 1;
-        }
-
-        let bytes = &buf[s..off];
-
-        off += 1;
-        s = off+1-s;
-
-        Self {
-            n: bytes,
-            s
-        }
-    }
-
-    fn encode(&self) -> Vec<u8> {
-        let mut r: Vec<u8> = Vec::with_capacity(self.s);
-
-        r.push(Self::TYPE.prefix());
-        r.extend_from_slice(self.n);
-        r.push(Self::TYPE.suffix());
-        r
-    }
-    /.*
-    fn encode(&self) -> &[u8] {
-        let mut data = vec![0u8; self.s];
-
-        data[0] = Self::TYPE.prefix();
-        data[1..=self.n.len()].copy_from_slice(self.n);
-        data[self.n.len() + 1] = Self::TYPE.suffix();
-
-        let ptr = data.as_ptr();
-        let len = data.len();
-
-        forget(data);
-
-        unsafe {
-            from_raw_parts(ptr, len)
-        }
-    }
-    *./
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn byte_size(&self) -> usize {
-        self.s
-    }
-}
-*/

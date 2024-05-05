@@ -4,8 +4,7 @@ pub enum BencodeType {
     Number,
     Object,
     Array,
-    Bytes,
-    Invalid
+    Bytes
 }
 
 impl BencodeType {
@@ -42,13 +41,13 @@ impl BencodeType {
         }
     }
 
-    pub fn type_by_prefix(c: u8) -> Self {
+    pub fn type_by_prefix(c: u8) -> Result<Self, ()> {
         for btype in [BencodeType::Number, BencodeType::Array, BencodeType::Object, BencodeType::Bytes] {
             if btype.is_prefix(c) {
-                return btype;
+                return Ok(btype);
             }
         }
 
-        BencodeType::Invalid
+        Err(())
     }
 }

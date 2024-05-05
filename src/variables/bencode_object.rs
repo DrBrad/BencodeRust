@@ -167,9 +167,10 @@ impl BencodeVariable for BencodeObject {
         buf
     }
 
-    fn decode_with_offset(buf: &[u8], off: usize) -> Self where Self: Sized {
-        if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
-            panic!("Buffer is not a bencode array.");
+    fn decode_with_offset(buf: &[u8], off: usize) -> Result<Self, ()> where Self: Sized {//Self where Self: Sized {
+        let type_ = BencodeType::type_by_prefix(buf[off]).map_err(|_| ())?;
+        if type_ != Self::TYPE {
+            return Err(());
         }
 
         let mut off = off+1;
@@ -177,40 +178,39 @@ impl BencodeVariable for BencodeObject {
         let mut res = OrderedMap::<BencodeBytes, Box<dyn BencodeVariable>>::new();//::with_hasher(Default::default());
 
         while buf[off] != Self::TYPE.suffix() {
-            let key = BencodeBytes::decode_with_offset(buf, off);
+            let key = BencodeBytes::decode_with_offset(buf, off)?;
             off += key.byte_size();
-            let type_ = BencodeType::type_by_prefix(buf[off]);
+            let type_ = BencodeType::type_by_prefix(buf[off])?;
 
             let value = match type_ {
                 BencodeType::Number => {
-                    let value = BencodeNumber::decode_with_offset(buf, off);
+                    let value = BencodeNumber::decode_with_offset(buf, off)?;
                     off += value.byte_size();
                     Box::new(value) as Box<dyn BencodeVariable>
                 },
                 BencodeType::Array => {
-                    let value = BencodeArray::decode_with_offset(buf, off);
+                    let value = BencodeArray::decode_with_offset(buf, off)?;
                     off += value.byte_size();
                     Box::new(value) as Box<dyn BencodeVariable>
                 },
                 BencodeType::Object => {
-                    let value = BencodeObject::decode_with_offset(buf, off);
+                    let value = BencodeObject::decode_with_offset(buf, off)?;
                     off += value.byte_size();
                     Box::new(value) as Box<dyn BencodeVariable>
                 },
                 BencodeType::Bytes => {
-                    let value = BencodeBytes::decode_with_offset(buf, off);
+                    let value = BencodeBytes::decode_with_offset(buf, off)?;
                     off += value.byte_size();
                     Box::new(value) as Box<dyn BencodeVariable>
-                },
-                _ => unimplemented!()
+                }
             };
 
             res.insert(key, value);
         }
 
-        Self {
+        Ok(Self {
             m: res
-        }
+        })
     }
 
     fn as_any(&self) -> &dyn Any {

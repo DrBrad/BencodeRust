@@ -4,11 +4,11 @@ pub trait BencodeVariable {
 
     fn encode(&self) -> Vec<u8>;
 
-    fn decode(buf: &[u8]) -> Self where Self: Sized {
+    fn decode(buf: &[u8]) -> Result<Self, ()> where Self: Sized {
         Self::decode_with_offset(buf, 0)
     }
 
-    fn decode_with_offset(buf: &[u8], off: usize) -> Self where Self: Sized;
+    fn decode_with_offset(buf: &[u8], off: usize) -> Result<Self, ()> where Self: Sized;//Self where Self: Sized;
 
     fn as_any(&self) -> &dyn Any;
 

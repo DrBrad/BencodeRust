@@ -8,7 +8,7 @@ use crate::variables::inter::bencode_type::BencodeType;
 pub struct BencodeBytes {
     b: Vec<u8>,
     s: usize
-}//(&'a [u8]);
+}
 
 impl BencodeBytes {
 
@@ -47,8 +47,6 @@ impl From<Vec<u8>> for BencodeBytes {
 impl From<&str> for BencodeBytes {
 
     fn from(value: &str) -> Self {
-        //let value = value.as_bytes();
-
         Self {
             b: value.as_bytes().to_vec(),
             s: value.len()+value.len().to_string().len()+1
@@ -92,9 +90,10 @@ impl BencodeVariable for BencodeBytes {
         r
     }
 
-    fn decode_with_offset(buf: &[u8], off: usize) -> Self where Self: Sized {
-        if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
-            panic!("Buffer is not a bencode bytes / string.");
+    fn decode_with_offset(buf: &[u8], off: usize) -> Result<Self, ()> where Self: Sized {
+        let type_ = BencodeType::type_by_prefix(buf[off]).map_err(|_| ())?;
+        if type_ != Self::TYPE {
+            return Err(());
         }
 
         let mut off = off;
@@ -112,10 +111,10 @@ impl BencodeVariable for BencodeBytes {
         off += 1+length;
         s = off-s;
 
-        Self {
+        Ok(Self {
             b: bytes,
             s
-        }
+        })
     }
     /*
     fn encode(&self) -> &[u8] {

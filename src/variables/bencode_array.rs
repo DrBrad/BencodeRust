@@ -146,9 +146,10 @@ impl BencodeVariable for BencodeArray {
         buf
     }
 
-    fn decode_with_offset(buf: &[u8], off: usize) -> Self {
-        if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
-            panic!("Buffer is not a bencode array.");
+    fn decode_with_offset(buf: &[u8], off: usize) -> Result<Self, ()> where Self: Sized {
+        let type_ = BencodeType::type_by_prefix(buf[off]).map_err(|_| ())?;
+        if type_ != Self::TYPE {
+            return Err(());
         }
 
         let mut off = off+1;
@@ -156,38 +157,37 @@ impl BencodeVariable for BencodeArray {
         let mut res = Vec::new();
 
         while buf[off] != Self::TYPE.suffix() {
-            let type_ = BencodeType::type_by_prefix(buf[off]);
+            let type_ = BencodeType::type_by_prefix(buf[off])?;
 
             let item = match type_ {
                 BencodeType::Number => {
-                    let value = BencodeNumber::decode_with_offset(buf, off);
+                    let value = BencodeNumber::decode_with_offset(buf, off)?;
                     off += value.byte_size();
                     Box::new(value) as Box<dyn BencodeVariable>
                 },
                 BencodeType::Array => {
-                    let value = BencodeArray::decode_with_offset(buf, off);
+                    let value = BencodeArray::decode_with_offset(buf, off)?;
                     off += value.byte_size();
                     Box::new(value) as Box<dyn BencodeVariable>
                 },
                 BencodeType::Object => {
-                    let value = BencodeObject::decode_with_offset(buf, off);
+                    let value = BencodeObject::decode_with_offset(buf, off)?;
                     off += value.byte_size();
                     Box::new(value) as Box<dyn BencodeVariable>
                 },
                 BencodeType::Bytes => {
-                    let value = BencodeBytes::decode_with_offset(buf, off);
+                    let value = BencodeBytes::decode_with_offset(buf, off)?;
                     off += value.byte_size();
                     Box::new(value) as Box<dyn BencodeVariable>
-                },
-                _ => unimplemented!()
+                }
             };
 
             res.push(item);
         }
 
-        Self {
+        Ok(Self {
             l: res
-        }
+        })
     }
 
     fn as_any_mut(&mut self) -> &mut dyn Any {
