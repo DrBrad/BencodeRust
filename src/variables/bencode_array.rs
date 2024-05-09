@@ -35,31 +35,86 @@ impl BencodeArray {
     }
 
     pub fn get_number<V>(&self, index: usize) -> Result<V, String> where V: FromStr {
-        self.l.get(index).unwrap().as_any().downcast_ref::<BencodeNumber>().unwrap().parse::<V>()
+        //self.l.get(index).unwrap().as_any().downcast_ref::<BencodeNumber>().unwrap().parse::<V>()
+        match self.l.get(index) {
+            Some(num) => {
+                Ok(num.as_any().downcast_ref::<BencodeNumber>().unwrap().parse::<V>()?)
+            },
+            None => {
+                Err("Variable doesn't exist.".to_string())
+            }
+        }
     }
 
     pub fn get_array(&self, index: usize) -> Result<&BencodeArray, String> {
-        Ok(self.l.get(index).unwrap().as_any().downcast_ref::<BencodeArray>().unwrap())
+        //Ok(self.l.get(index).unwrap().as_any().downcast_ref::<BencodeArray>().unwrap())
+        match self.l.get(index) {
+            Some(arr) => {
+                Ok(arr.as_any().downcast_ref::<BencodeArray>().unwrap())
+            },
+            None => {
+                Err("Variable doesn't exist.".to_string())
+            }
+        }
     }
 
     pub fn get_array_mut(&mut self, index: usize) -> Result<&mut BencodeArray, String> {
-        Ok(self.l.get_mut(index).unwrap().as_any_mut().downcast_mut::<BencodeArray>().unwrap())
+        //Ok(self.l.get_mut(index).unwrap().as_any_mut().downcast_mut::<BencodeArray>().unwrap())
+        match self.l.get_mut(index) {
+            Some(arr) => {
+                Ok(arr.as_any_mut().downcast_mut::<BencodeArray>().unwrap())
+            },
+            None => {
+                Err("Variable doesn't exist.".to_string())
+            }
+        }
     }
 
     pub fn get_object(&self, index: usize) -> Result<&BencodeObject, String> {
-        Ok(self.l.get(index).unwrap().as_any().downcast_ref::<BencodeObject>().unwrap())
+        //Ok(self.l.get(index).unwrap().as_any().downcast_ref::<BencodeObject>().unwrap())
+        match self.l.get(index) {
+            Some(obj) => {
+                Ok(obj.as_any().downcast_ref::<BencodeObject>().unwrap())
+            },
+            None => {
+                Err("Variable doesn't exist.".to_string())
+            }
+        }
     }
 
     pub fn get_object_mut(&mut self, index: usize) -> Result<&mut BencodeObject, String> {
-        Ok(self.l.get_mut(index).unwrap().as_any_mut().downcast_mut::<BencodeObject>().unwrap())
+        //Ok(self.l.get_mut(index).unwrap().as_any_mut().downcast_mut::<BencodeObject>().unwrap())
+        match self.l.get_mut(index) {
+            Some(obj) => {
+                Ok(obj.as_any_mut().downcast_mut::<BencodeObject>().unwrap())
+            },
+            None => {
+                Err("Variable doesn't exist.".to_string())
+            }
+        }
     }
 
     pub fn get_bytes(&self, index: usize) -> Result<&[u8], String> {
-        Ok(self.l.get(index).unwrap().as_any().downcast_ref::<BencodeBytes>().unwrap().as_bytes())
+        match self.l.get(index) {
+            Some(str) => {
+                Ok(str.as_any().downcast_ref::<BencodeBytes>().unwrap().as_bytes())
+            },
+            None => {
+                Err("Variable doesn't exist.".to_string())
+            }
+        }
+        //Ok(self.l.get(index).unwrap().as_any().downcast_ref::<BencodeBytes>().unwrap().as_bytes())
     }
 
     pub fn get_string(&self, index: usize) -> Result<&str, String> {
-        self.l.get(index).unwrap().as_any().downcast_ref::<BencodeBytes>().unwrap().as_str()
+        match self.l.get(index) {
+            Some(str) => {
+                Ok(str.as_any().downcast_ref::<BencodeBytes>().unwrap().as_str()?)
+            },
+            None => {
+                Err("Variable doesn't exist.".to_string())
+            }
+        }
     }
 }
 /*
