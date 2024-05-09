@@ -67,7 +67,14 @@ impl BencodeObject {
 
     pub fn get_string(&self, key: &str) -> Result<&str, String> {
         let key = BencodeBytes::from(key);
-        self.m.get(&key).unwrap().as_any().downcast_ref::<BencodeBytes>().unwrap().as_str()
+        match self.m.get(&key) {
+            Some(str) => {
+                Ok(str.as_any().downcast_ref::<BencodeBytes>().unwrap().as_str()?)
+            },
+            None => {
+                Err("Variable doesn't exist.".to_string())
+            }
+        }
     }
 }
 
