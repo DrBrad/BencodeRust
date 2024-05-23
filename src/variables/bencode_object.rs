@@ -123,6 +123,10 @@ impl BencodeObject {
             }
         }
     }
+
+    pub fn size(&self) -> usize {
+        self.m.len()
+    }
 }
 
 //REF FROM PARENT FOR OBSERVING UPDATES TO SIZE...

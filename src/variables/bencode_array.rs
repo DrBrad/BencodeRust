@@ -116,6 +116,10 @@ impl BencodeArray {
             }
         }
     }
+
+    pub fn size(&self) -> usize {
+        self.l.len()
+    }
 }
 /*
 impl From<Vec<Box<dyn Bencode>>> for BencodeArray {
