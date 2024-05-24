@@ -58,6 +58,6 @@ impl<K, V> OrderedMap<K, V> where K: Eq + Hash + Clone {
     }
 
     pub fn len(&self) -> usize {
-        self.len()
+        self.map.len()
     }
 }
