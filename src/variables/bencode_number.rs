@@ -1,36 +1,39 @@
+use std::any::Any;
 use std::str::{from_utf8, FromStr};
-use std::slice::from_raw_parts;
-use std::mem::forget;
 
-use crate::variables::inter::bencode_variable::Bencode;
+use crate::variables::inter::bencode_variable::BencodeVariable;
 use crate::variables::inter::bencode_type::BencodeType;
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
-pub struct BencodeNumber<'a>{
-    n: &'a [u8],
+pub struct BencodeNumber {
+    n: Vec<u8>,
     s: usize
 }
 
-impl<'a> BencodeNumber<'a> {
+impl BencodeNumber {
 
     const TYPE: BencodeType = BencodeType::Number;
 
-    pub fn parse<V>(&self) -> Result<V, ()> where V: FromStr {
-        let str = from_utf8(&self.n).map_err(|_| ());//..unwrap_or_else(|_| panic!("Failed to parse UTF-8 string"));
-        str?.parse::<V>().map_err(|_| ())//.unwrap_or_else(|_| panic!("Failed to parse to Number"))
-    }
-
-    pub fn to_string(&self) -> String {
-        String::from_utf8_lossy(&self.n).to_string()
+    pub fn parse<V>(&self) -> Result<V, String> where V: FromStr {
+        let str = from_utf8(&self.n).map_err(|e| e.to_string())?;
+        str.parse::<V>().map_err(|_| "Failed to parse number.".to_string())
     }
 }
 
 macro_rules! impl_decodable_number {
     ($($type:ty)*) => {
         $(
-            impl<'a> From<$type> for BencodeNumber<'a> {
+            impl From<$type> for BencodeNumber {
 
                 fn from(value: $type) -> Self {
+                    let value = value.to_string().into_bytes();
+                    let s = value.len()+2;
+
+                    Self {
+                        n: value,
+                        s
+                    }
+                    /*
                     let value = value.to_string();
                     let size = value.len()+2;
 
@@ -44,6 +47,7 @@ macro_rules! impl_decodable_number {
                             s: size
                         }
                     }
+                    */
                 }
             }
         )*
@@ -52,11 +56,21 @@ macro_rules! impl_decodable_number {
 
 impl_decodable_number!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 isize f32 f64);
 
-impl<'a> Bencode<'a> for BencodeNumber<'a> {
+impl BencodeVariable for BencodeNumber {
 
-    fn decode_with_offset(buf: &'a [u8], off: usize) -> Self {
-        if BencodeType::type_by_prefix(buf[off]) != Self::TYPE {
-            panic!("Buffer is not a bencode bytes / string.");
+    fn encode(&self) -> Vec<u8> {
+        let mut r: Vec<u8> = Vec::with_capacity(self.s);
+
+        r.push(Self::TYPE.prefix());
+        r.extend_from_slice(&self.n);
+        r.push(Self::TYPE.suffix());
+        r
+    }
+
+    fn decode_with_offset(buf: &[u8], off: usize) -> Result<Self, String> where Self: Sized {
+        let type_ = BencodeType::type_by_prefix(buf[off]).map_err(|e| e.to_string())?;
+        if type_ != Self::TYPE {
+            return Err("Byte array is not a bencode number.".to_string());
         }
 
         let mut off = off+1;
@@ -69,45 +83,30 @@ impl<'a> Bencode<'a> for BencodeNumber<'a> {
             off += 1;
         }
 
-        let bytes = &buf[s..off];
+        let bytes = buf[s..off].to_vec();
 
         off += 1;
         s = off+1-s;
 
-        Self {
+        Ok(Self {
             n: bytes,
             s
-        }
+        })
     }
 
-    fn encode(&self) -> Vec<u8> {
-        let mut r: Vec<u8> = Vec::with_capacity(self.s);
-
-        r.push(Self::TYPE.prefix());
-        r.extend_from_slice(self.n);
-        r.push(Self::TYPE.suffix());
-        r
+    fn as_any(&self) -> &dyn Any {
+        self
     }
-    /*
-    fn encode(&self) -> &[u8] {
-        let mut data = vec![0u8; self.s];
 
-        data[0] = Self::TYPE.prefix();
-        data[1..=self.n.len()].copy_from_slice(self.n);
-        data[self.n.len() + 1] = Self::TYPE.suffix();
-
-        let ptr = data.as_ptr();
-        let len = data.len();
-
-        forget(data);
-
-        unsafe {
-            from_raw_parts(ptr, len)
-        }
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
     }
-    */
 
     fn byte_size(&self) -> usize {
         self.s
+    }
+
+    fn to_string(&self) -> String {
+        String::from_utf8_lossy(&self.n).to_string()
     }
 }

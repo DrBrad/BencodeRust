@@ -56,4 +56,8 @@ impl<K, V> OrderedMap<K, V> where K: Eq + Hash + Clone {
     pub fn keys(&self) -> &Vec<K> {
         &self.keys
     }
+
+    pub fn len(&self) -> usize {
+        self.len()
+    }
 }

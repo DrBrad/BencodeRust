@@ -2,7 +2,6 @@ pub mod variables;
 pub mod utils;
 
 //TODO
-//- oberserver to update size of arrays from child to parent
 //- add i/o option
 
 #[cfg(test)]
@@ -10,7 +9,7 @@ mod tests {
 
     use crate::variables::bencode_array::{AddArray, BencodeArray};
     use crate::variables::bencode_object::{BencodeObject, PutObject};
-    use crate::variables::inter::bencode_variable::Bencode;
+    use crate::variables::inter::bencode_variable::BencodeVariable;
 
     #[test]
     fn main() {
@@ -40,7 +39,7 @@ mod tests {
 
         println!("{}", obj.to_string());
 
-        let decoded = BencodeObject::decode(&encoded);
+        let decoded = BencodeObject::decode(&encoded).unwrap();
         println!("{}", decoded.to_string());
     }
 
