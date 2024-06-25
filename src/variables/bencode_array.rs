@@ -14,6 +14,8 @@ pub struct BencodeArray {
 pub trait AddArray<V> {
 
     fn add(&mut self, value: V);
+
+    fn insert(&mut self, index: usize, value: V);
 }
 
 impl BencodeArray {
@@ -139,12 +141,20 @@ impl<const N: usize> AddArray<[u8; N]> for BencodeArray {
     fn add(&mut self, value: [u8; N]) {
         self.l.push(Box::new(BencodeBytes::from(value)));
     }
+
+    fn insert(&mut self, index: usize, value: [u8; N]) {
+        self.l.insert(index, Box::new(BencodeBytes::from(value)));
+    }
 }
 
 impl AddArray<Vec<u8>> for BencodeArray {
 
     fn add(&mut self, value: Vec<u8>) {
         self.l.push(Box::new(BencodeBytes::from(value)));
+    }
+
+    fn insert(&mut self, index: usize, value: Vec<u8>) {
+        self.l.insert(index, Box::new(BencodeBytes::from(value)));
     }
 }
 
@@ -153,12 +163,20 @@ impl AddArray<&str> for BencodeArray {
     fn add(&mut self, value: &str) {
         self.l.push(Box::new(BencodeBytes::from(value)));
     }
+
+    fn insert(&mut self, index: usize, value: &str) {
+        self.l.insert(index, Box::new(BencodeBytes::from(value)));
+    }
 }
 
 impl AddArray<String> for BencodeArray {
 
     fn add(&mut self, value: String) {
         self.l.push(Box::new(BencodeBytes::from(value)));
+    }
+
+    fn insert(&mut self, index: usize, value: String) {
+        self.l.insert(index, Box::new(BencodeBytes::from(value)));
     }
 }
 
@@ -167,12 +185,20 @@ impl AddArray<BencodeArray> for BencodeArray {
     fn add(&mut self, value: BencodeArray) {
         self.l.push(Box::new(value));
     }
+
+    fn insert(&mut self, index: usize, value: BencodeArray) {
+        self.l.insert(index, Box::new(value));
+    }
 }
 
 impl AddArray<BencodeObject> for BencodeArray {
 
     fn add(&mut self, value: BencodeObject) {
         self.l.push(Box::new(value));
+    }
+
+    fn insert(&mut self, index: usize, value: BencodeObject) {
+        self.l.insert(index, Box::new(value));
     }
 }
 
@@ -183,6 +209,10 @@ macro_rules! impl_array_number {
 
                 fn add(&mut self, value: $type) {
                     self.l.push(Box::new(BencodeNumber::from(value)));
+                }
+
+                fn insert(&mut self, index: usize, value: $type) {
+                    self.l.insert(index, Box::new(BencodeNumber::from(value)));
                 }
             }
         )*
