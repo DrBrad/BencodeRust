@@ -60,4 +60,8 @@ impl<K, V> OrderedMap<K, V> where K: Eq + Hash + Clone {
     pub fn len(&self) -> usize {
         self.map.len()
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.map.is_empty()
+    }
 }
